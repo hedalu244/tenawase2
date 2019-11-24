@@ -100,8 +100,8 @@ function test(){
     ctx.fill();
     sum += euclid(handles[i][0] - answers[i][0], handles[i][1] - answers[i][1]);
   }
-  score = Math.floor(1000 / (1 + 10 * sum / height / (n - 2))) / 10;
-  setTimeout(()=>alert(sum + "px の誤差\n" + score + "点"), 10);
+  score = Math.floor(10000 / (1 + 10 * sum / height / (n - 2))) / 100;
+  setTimeout(()=>alert(Math.floor(sum * 100) / 100 + "px の誤差\n" + score + "点"), 10);
 }
 
 window.onload = init;
