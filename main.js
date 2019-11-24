@@ -46,12 +46,21 @@ function init() {
     }
     update();
   };
-  canvas.onmousemove = canvas.ontouchmove = (event)=>{
+  canvas.onmousemove = (event)=>{
     event.preventDefault();
     mouseX = event.offsetX;
     mouseY = event.offsetY;
   }
-  canvas.onmouseup = canvas.ontouchend = (event)=>{
+  canvas.ontouchmove = (event)=>{
+    event.preventDefault();
+    var touchObject = event.changedTouches[0];
+    var clientRect = canvas.getBoundingClientRect() ;
+    var positionX = clientRect.left + window.pageXOffset;
+    var positionY = clientRect.top + window.pageYOffset;
+    mouseX = touchObject.pageX - positionX;
+  	mouseY = touchObject.pageY - positionY;
+  }
+	canvas.onmouseup = canvas.ontouchend = (event)=>{
     event.preventDefault();
     holding = null;
   };
