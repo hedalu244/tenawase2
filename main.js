@@ -39,10 +39,25 @@ function init() {
   }
   draw2();
 
-  canvas.onmousedown = canvas.ontouchstart = (event)=>{
+  canvas.onmousedown = (event)=>{
     event.preventDefault();
+    mouseX = event.offsetX;
+    mouseY = event.offsetY;
     for(var i=2; i < n; i++) {
-      if(euclid(handles[i][0] - event.offsetX, handles[i][1] - event.offsetY) < 5) holding = handles[i];
+      if(euclid(handles[i][0] - mouseX, handles[i][1] - mouseY) < 5) holding = handles[i];
+    }
+    update();
+  };
+  canvas.ontouchstart = (event)=>{
+    event.preventDefault();
+    var touchObject = event.changedTouches[0];
+    var clientRect = canvas.getBoundingClientRect() ;
+    var positionX = clientRect.left + window.pageXOffset;
+    var positionY = clientRect.top + window.pageYOffset;
+    mouseX = touchObject.pageX - positionX;
+  	mouseY = touchObject.pageY - positionY;
+    for(var i=2; i < n; i++) {
+      if(euclid(handles[i][0] - mouseX, handles[i][1] - mouseY) < 5) holding = handles[i];
     }
     update();
   };
