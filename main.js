@@ -40,16 +40,19 @@ function init() {
   draw2();
 
   canvas.onmousedown = canvas.ontouchstart = (event)=>{
+    event.preventDefault();
     for(var i=2; i < n; i++) {
       if(euclid(handles[i][0] - event.offsetX, handles[i][1] - event.offsetY) < 5) holding = handles[i];
     }
     update();
   };
   canvas.onmousemove = canvas.ontouchmove = (event)=>{
+    event.preventDefault();
     mouseX = event.offsetX;
     mouseY = event.offsetY;
   }
   canvas.onmouseup = canvas.ontouchend = (event)=>{
+    event.preventDefault();
     holding = null;
   };
 
