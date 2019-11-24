@@ -21,7 +21,10 @@ function init() {
   height2 = Math.random() * 100 + 200;
   canvas2.height = height2;
   canvas2.width = height2 * width / height;
-  canvas2.style.marginLeft = (Math.random()*600)+"px"
+  canvas2.style.marginLeft = (Math.random()*600)+"px";
+
+  handles = [];
+  answers = []
 
   var x = Math.floor(Math.random()* width);
   handles.push([x, 5]);
