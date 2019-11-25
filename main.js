@@ -1,7 +1,7 @@
 var handles = [];
 var answers = [];
-var n = 7;
-var colors = [[0, 0, 0], [0, 0, 0], [255, 0, 0], [0, 255, 0], [0, 0, 255], [0, 190, 240], [210, 0, 210], [190, 190, 0]];
+var n = 8;
+var colors = [[0, 0, 0], [0, 0, 0], [255, 0, 0], [0, 190, 0], [0, 0, 255], [0, 190, 230], [210, 0, 210], [210, 210, 0]];
 var canvas, ctx, width, height;
 var canvas2, ctx2, height2;
 var holding;
