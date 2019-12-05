@@ -14,15 +14,28 @@
       #canvas {
         border: 1px solid #333;
         display: block;
-        margin: 0 200px;
+        margin: 0 50px;
+      }
+      #wrapper {
+        display:flex
       }
     </style>
   </head>
   <body>
     自分の修行用<br>
     <canvas id="canvas2" width="200" height="200"></canvas><br>
+    <div id="wrapper">
+    <div id="ui">
+      <button type="button" onclick="test()" name="button">答え合わせ</button>
+      <button type="button" onclick="init()" name="button">次</button><br>
+      <select id="control"></select><br>
+      <button id="up" onclick="up()">↑</button><br>
+      <button id="left" onclick="left()">←</button>
+      <button id="right" onclick="right()">→</button><br>
+      <button id="down" onclick="down()">↓</button><br>
+      <input type="range" id="pitch" min="0" max="20">
+    </div>
     <canvas id="canvas" width="257" height="335"></canvas><br>
-    <button type="button" onclick="test()" name="button">答え合わせ</button>
-    <button type="button" onclick="init()" name="button">次</button>
+    </div>
   </body>
 </html>
