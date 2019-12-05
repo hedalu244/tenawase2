@@ -19,10 +19,10 @@ function init() {
 
   canvas2 = document.getElementById("canvas2");
   ctx2 = canvas2.getContext("2d");
-  height2 = Math.random() * 100 + 200;
+  height2 = Math.random() * 200 + 400;
   canvas2.height = height2;
   canvas2.width = height2 * width / height;
-  canvas2.style.marginLeft = (Math.random()*350 + 50)+"px";
+  canvas2.style.marginLeft = (Math.random()*700 + 100)+"px";
 
   handles = [];
   answers = []
@@ -99,7 +99,7 @@ function init() {
   }
   control.style.backgroundColor = "rgb(" + colors[2] + ")";
 
-  document.getElementById("pitch").value = "30";
+  document.getElementById("pitch").value = "25";
   draw();
 }
 
