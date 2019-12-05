@@ -19,6 +19,10 @@
       #wrapper {
         display:flex
       }
+      #arrows button {
+        width: 40px;
+        height: 40px;
+      }
     </style>
   </head>
   <body>
@@ -30,7 +34,7 @@
       <button type="button" onclick="init()" name="button">次</button><br><br>
       <input type="range" id="pitch" min="0" max="30"><br>
       <select id="control"></select><br>
-      <table>
+      <table id="arrows">
         <tr><td></td><td><button id="up" onclick="up()">↑</button></td><td></td></tr>
         <tr><td><button id="left" onclick="left()">←</button></td><td></td>
           <td><button id="right" onclick="right()">→</button><br></td></tr>
