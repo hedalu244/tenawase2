@@ -77,35 +77,38 @@ function init() {
   }
   control.style.backgroundColor = "rgb(" + colors[2] + ")";
 
-  document.getElementById("pitch").value = "25";
+  document.getElementById("pitch").value = "100";
   draw();
+}
+
+function getPitch(){
+  var x = +document.getElementById("pitch").value * 0.01;
+  var a = 20;
+  var b = 3;
+  return a * (Math.exp(b * x) - 1) / b + 1;
 }
 
 function left(){
   var select = +document.getElementById("control").value;
-  var pitch = Math.pow(1.15, +document.getElementById("pitch").value);
-  handles[select][0] -= pitch;
+  handles[select][0] -= getPitch();
   if(handles[select][0] < 0) handles[select][0] = 0;
   draw();
 }
 function right(){
   var select = +document.getElementById("control").value;
-  var pitch = Math.pow(1.15, +document.getElementById("pitch").value);
-  handles[select][0] += pitch;
+  handles[select][0] += getPitch();
   if(width < handles[select][0]) handles[select][0] = width;
   draw();
 }
 function up(){
   var select = +document.getElementById("control").value;
-  var pitch = Math.pow(1.15, +document.getElementById("pitch").value);
-  handles[select][1] -= pitch;
+  handles[select][1] -= getPitch();
   if(handles[select][1] < 0) handles[select][1] = 0;
   draw();
 }
 function down(){
   var select = +document.getElementById("control").value;
-  var pitch = Math.pow(1.15, +document.getElementById("pitch").value);
-  handles[select][1] += pitch;
+  handles[select][1] += getPitch();
   if(height < handles[select][1]) handles[select][1] = height;
   draw();
 }
