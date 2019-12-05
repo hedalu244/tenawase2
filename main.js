@@ -28,11 +28,11 @@ function init() {
   answers = []
 
   var x = Math.floor(Math.random()* width);
-  handles.push([x, 5]);
-  answers.push([x, 5])
+  handles.push([x, 10]);
+  answers.push([x, 10])
   x = Math.floor(Math.random()* width);
-  handles.push([x, height - 5]);
-  answers.push([x, height - 5])
+  handles.push([x, height - 10]);
+  answers.push([x, height - 10])
   for(var i=2; i < n; i++) {
     var x = Math.floor(Math.random()* width);
     var y = Math.floor(Math.random()* height);
@@ -48,20 +48,7 @@ function init() {
     mouseX = event.offsetX;
     mouseY = event.offsetY;
     for(var i=2; i < n; i++) {
-      if(euclid(handles[i][0] - mouseX, handles[i][1] - mouseY) < 5) holding = handles[i];
-    }
-    update();
-  };
-  canvas.ontouchstart = (event)=>{
-    event.preventDefault();
-    var touchObject = event.changedTouches[0];
-    var clientRect = canvas.getBoundingClientRect() ;
-    var positionX = clientRect.left + window.pageXOffset;
-    var positionY = clientRect.top + window.pageYOffset;
-    mouseX = touchObject.pageX - positionX;
-  	mouseY = touchObject.pageY - positionY;
-    for(var i=2; i < n; i++) {
-      if(euclid(handles[i][0] - mouseX, handles[i][1] - mouseY) < 5) holding = handles[i];
+      if(euclid(handles[i][0] - mouseX, handles[i][1] - mouseY) < 10) holding = handles[i];
     }
     update();
   };
@@ -69,15 +56,6 @@ function init() {
     event.preventDefault();
     mouseX = event.offsetX;
     mouseY = event.offsetY;
-  }
-  canvas.ontouchmove = (event)=>{
-    event.preventDefault();
-    var touchObject = event.changedTouches[0];
-    var clientRect = canvas.getBoundingClientRect() ;
-    var positionX = clientRect.left + window.pageXOffset;
-    var positionY = clientRect.top + window.pageYOffset;
-    mouseX = touchObject.pageX - positionX;
-  	mouseY = touchObject.pageY - positionY;
   }
 	canvas.onmouseup = canvas.ontouchend = (event)=>{
     event.preventDefault();
@@ -147,7 +125,7 @@ function draw(){
   for(var i=0; i < n; i++) {
     ctx.fillStyle = "rgba(" + colors[i] + ", 0.8)";
     ctx.beginPath();
-    ctx.arc(handles[i][0], handles[i][1], 5, 0, 2 * Math.PI);
+    ctx.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
     ctx.fill();
   }
 }
@@ -157,7 +135,7 @@ function draw2(){
   for(var i=0; i < n; i++) {
     ctx2.fillStyle = "rgba(" + colors[i] + ", 0.8)";
     ctx2.beginPath();
-    ctx2.arc(answers[i][0] * height2 / height, answers[i][1] * height2 / height, 5 * height2 / height, 0, 2 * Math.PI);
+    ctx2.arc(answers[i][0] * height2 / height, answers[i][1] * height2 / height, 10 * height2 / height, 0, 2 * Math.PI);
     ctx2.fill();
   }
 }
@@ -168,11 +146,11 @@ function test(){
   for(var i=0; i < n; i++) {
     ctx.fillStyle = "rgba(" + colors[i] + ", 0.8)";
     ctx.beginPath();
-    ctx.arc(handles[i][0], handles[i][1], 5, 0, 2 * Math.PI);
+    ctx.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
     ctx.fill();
     ctx.fillStyle = "rgba(" + colors[i] + ", 0.5)";
     ctx.beginPath();
-    ctx.arc(answers[i][0], answers[i][1], 5, 0, 2 * Math.PI);
+    ctx.arc(answers[i][0], answers[i][1], 10, 0, 2 * Math.PI);
     ctx.fill();
     sum += euclid(handles[i][0] - answers[i][0], handles[i][1] - answers[i][1]);
   }
