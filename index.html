@@ -27,13 +27,16 @@
     <div id="wrapper">
     <div id="ui">
       <button type="button" onclick="test()" name="button">答え合わせ</button>
-      <button type="button" onclick="init()" name="button">次</button><br>
+      <button type="button" onclick="init()" name="button">次</button><br><br>
+      <input type="range" id="pitch" min="0" max="20"><br>
       <select id="control"></select><br>
-      <button id="up" onclick="up()">↑</button><br>
-      <button id="left" onclick="left()">←</button>
-      <button id="right" onclick="right()">→</button><br>
-      <button id="down" onclick="down()">↓</button><br>
-      <input type="range" id="pitch" min="0" max="20">
+      <table>
+        <tr><td></td><td><button id="up" onclick="up()">↑</button></td><td></td></tr>
+        <tr><td><button id="left" onclick="left()">←</button></td><td></td>
+          <td><button id="right" onclick="right()">→</button><br></td></tr>
+        <tr><td></td><td><button id="down" onclick="down()">↓</button></td><td></td></tr>
+      </table>
+
     </div>
     <canvas id="canvas" width="257" height="335"></canvas><br>
     </div>

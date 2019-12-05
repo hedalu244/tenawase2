@@ -2,6 +2,7 @@ var handles = [];
 var answers = [];
 var n = 8;
 var colors = [[0, 0, 0], [0, 0, 0], [255, 0, 0], [0, 190, 0], [0, 0, 255], [0, 190, 230], [210, 0, 210], [210, 210, 0]];
+var colorName = ["", "", "red", "green", "blue", "sky", "violet", "yellow"]
 var canvas, ctx, width, height;
 var canvas2, ctx2, height2;
 var holding;
@@ -86,7 +87,7 @@ function init() {
   control.innerText = "";
   for(var i = 2; i < colors.length; i++) {
     a = document.createElement("option")
-    a.innerText = ("　　　")
+    a.innerText = colorName[i]
     a.style.backgroundColor = "rgb(" + colors[i] + ")";
     a.value = "" + i;
     if(i==2) a.selected = true;
