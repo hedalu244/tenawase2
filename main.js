@@ -99,34 +99,34 @@ function init() {
   }
   control.style.backgroundColor = "rgb(" + colors[2] + ")";
 
-  document.getElementById("pitch").value = "20";
+  document.getElementById("pitch").value = "30";
   draw();
 }
 
 function left(){
   var select = +document.getElementById("control").value;
-  var pitch = +document.getElementById("pitch").value;
+  var pitch = Math.pow(1.15, +document.getElementById("pitch").value);
   handles[select][0] -= pitch;
   if(handles[select][0] < 0) handles[select][0] = 0;
   draw();
 }
 function right(){
   var select = +document.getElementById("control").value;
-  var pitch = +document.getElementById("pitch").value;
+  var pitch = Math.pow(1.15, +document.getElementById("pitch").value);
   handles[select][0] += pitch;
   if(width < handles[select][0]) handles[select][0] = width;
   draw();
 }
 function up(){
   var select = +document.getElementById("control").value;
-  var pitch = +document.getElementById("pitch").value;
+  var pitch = Math.pow(1.15, +document.getElementById("pitch").value);
   handles[select][1] -= pitch;
   if(handles[select][1] < 0) handles[select][1] = 0;
   draw();
 }
 function down(){
   var select = +document.getElementById("control").value;
-  var pitch = +document.getElementById("pitch").value;
+  var pitch = Math.pow(1.15, +document.getElementById("pitch").value);
   handles[select][1] += pitch;
   if(height < handles[select][1]) handles[select][1] = height;
   draw();
