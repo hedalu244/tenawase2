@@ -27,18 +27,18 @@ function init() {
   handles = [];
   answers = []
 
-  var x = Math.floor(Math.random()* width);
-  handles.push([x, 10]);
-  answers.push([x, 10])
-  x = Math.floor(Math.random()* width);
-  handles.push([x, height - 10]);
-  answers.push([x, height - 10])
+  var x = Math.floor(Math.random() * (width - 24) + 12);
+  handles.push([x, 12]);
+  answers.push([x, 12])
+  x = Math.floor(Math.random() * (width - 24) + 12);
+  handles.push([x, height - 12]);
+  answers.push([x, height - 12])
   for(var i=2; i < n; i++) {
-    var x = Math.floor(Math.random()* width);
-    var y = Math.floor(Math.random()* height);
+    var x = Math.floor(Math.random()* (width - 24) + 12);
+    var y = Math.floor(Math.random()* (height - 24) + 12);
     handles.push([x, y]);
-    var x = Math.floor(Math.random()* width);
-    var y = Math.floor(Math.random()* height);
+    var x = Math.floor(Math.random()* (width - 24) + 12);
+    var y = Math.floor(Math.random()* (height - 24) + 12);
     answers.push([x, y]);
   }
   draw2();
