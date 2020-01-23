@@ -29,17 +29,21 @@ function init() {
 
   var x = Math.floor(Math.random() * (width - 24) + 12);
   handles.push([x, 12]);
-  answers.push([x, 12])
+  answers.push([x, 12]);
   x = Math.floor(Math.random() * (width - 24) + 12);
   handles.push([x, height - 12]);
-  answers.push([x, height - 12])
-  for(var i=2; i < n; i++) {
+  answers.push([x, height - 12]);
+  while (handles.length < n) {
     var x = Math.floor(Math.random()* (width - 24) + 12);
     var y = Math.floor(Math.random()* (height - 24) + 12);
-    handles.push([x, y]);
+    if(handles.every(a=>(50 < euclid(a[0] - x, a[1] - y))))
+      handles.push([x, y]);
+  }
+  while (answers.length < n) {
     var x = Math.floor(Math.random()* (width - 24) + 12);
     var y = Math.floor(Math.random()* (height - 24) + 12);
-    answers.push([x, y]);
+    if(answers.every(a=>(50 < euclid(a[0] - x, a[1] - y))))
+      answers.push([x, y]);
   }
   draw2();
 
