@@ -1,8 +1,8 @@
 var handles = [];
 var answers = [];
 var n = 8;
-var colors = [[0, 0, 0], [0, 0, 0], [255, 0, 0], [0, 190, 0], [0, 0, 255], [0, 190, 230], [210, 0, 210], [210, 210, 0]];
-var colorName = ["", "", "red", "green", "blue", "sky", "violet", "yellow"]
+var colors = [[0, 0, 0], [0, 0, 0], [255, 0, 0], [210, 210, 0], [0, 190, 0], [0, 190, 230], [0, 0, 255], [210, 0, 210]];
+var colorName = ["", "", "red", "yellow", "green", "sky", "blue", "violet"]
 var canvas, ctx, width, height;
 var canvas2, ctx2, height2;
 var holding;
