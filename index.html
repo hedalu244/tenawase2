@@ -41,22 +41,13 @@
   </head>
   <body>
     自分の修行用<br>
-    <canvas id="canvas2" width="400" height="400"></canvas><br>
-    <div id="wrapper">
     <div id="ui">
+      <input type="range" id="pitch" min="0" max="100">
+      <select id="control"></select>
       <button type="button" onclick="test()" name="button">答え合わせ</button>
-      <button type="button" onclick="init()" name="button">次</button><br><br>
-      <input type="range" id="pitch" min="0" max="100"><br>
-      <select id="control"></select><br>
-      <table id="arrows">
-        <tr><td></td><td><button id="up" onclick="up()">↑</button></td><td></td></tr>
-        <tr><td><button id="left" onclick="left()">←</button></td><td></td>
-          <td><button id="right" onclick="right()">→</button><br></td></tr>
-        <tr><td></td><td><button id="down" onclick="down()">↓</button></td><td></td></tr>
-      </table>
-
+      <button type="button" onclick="init()" name="button">次</button>
     </div>
-    <canvas id="canvas" width="514" height="670"></canvas><br>
-    </div>
+    <canvas id="canvas2" width="400" height="400"></canvas><br>
+    <canvas id="canvas" width="514" height="670" style="margin: auto;"></canvas><br>
   </body>
 </html>

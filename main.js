@@ -22,7 +22,7 @@ function init() {
   height2 = Math.random() * 200 + 400;
   canvas2.height = height2;
   canvas2.width = height2 * width / height;
-  canvas2.style.marginLeft = (Math.random() * 700 + 100) + "px";
+  canvas2.style.marginLeft = (Math.random() * (window.innerWidth - canvas2.width)) + "px";
 
   handles = [];
   answers = [];
