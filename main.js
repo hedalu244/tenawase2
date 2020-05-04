@@ -140,24 +140,28 @@ function left() {
   var select = +document.getElementById("control").value;
   handles[select][0] -= getPitch();
   if (handles[select][0] < 0) handles[select][0] = 0;
+  navigator.vibrate(100);
   draw();
 }
 function right() {
   var select = +document.getElementById("control").value;
   handles[select][0] += getPitch();
   if (width < handles[select][0]) handles[select][0] = width;
+  navigator.vibrate(100);
   draw();
 }
 function up() {
   var select = +document.getElementById("control").value;
   handles[select][1] -= getPitch();
   if (handles[select][1] < 0) handles[select][1] = 0;
+  navigator.vibrate(100);
   draw();
 }
 function down() {
   var select = +document.getElementById("control").value;
   handles[select][1] += getPitch();
   if (height < handles[select][1]) handles[select][1] = height;
+  navigator.vibrate(100);
   draw();
 }
 
