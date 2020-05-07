@@ -1,8 +1,8 @@
 var handles = [];
 var answers = [];
 var n = 8;
-var colors = [[0, 0, 0], [0, 0, 0], [255, 0, 0], [210, 210, 0], [0, 190, 0], [0, 190, 230], [0, 0, 255], [210, 0, 210]];
-var colorName = ["", "", "red", "yellow", "green", "sky", "blue", "violet"];
+var colors = [[10, 10, 10], [10, 10, 10], [255, 0, 0], [210, 210, 0], [0, 190, 0], [0, 190, 230], [0, 0, 255], [210, 0, 210]];
+var colorName = ["", "black", "red", "yellow", "green", "sky", "blue", "violet"];
 var canvas, context, width, height;
 var canvas2, context2, height2;
 var holding, selected;
@@ -65,6 +65,7 @@ function init() {
     event.preventDefault();
     holding = 0;
   };
+  /*
   let control = document.getElementById("control");
   control.innerText = "";
   for (var i = 1; i < colors.length; i++) {
@@ -80,6 +81,30 @@ function init() {
     control.style.backgroundColor = "rgb(" + colors[selected] + ")";
   };
   control.style.backgroundColor = "rgb(" + colors[2] + ")";
+  */
+  
+  control = document.getElementById("colors");
+  for (let i = 1; i < colors.length; i++) {
+    let li = document.createElement("li");
+    control.appendChild(li);
+
+    let a = document.createElement("input");
+    a.type = "radio";
+    a.id = "color" + i;
+    a.name = "colors";
+    li.appendChild(a);
+    a.onchange = () => {
+      selected = i;
+      console.log(i);
+    };
+
+    let b = document.createElement("label");
+    b.setAttribute("for", a.id);
+    b.innerHTML = "<span></span>";
+    b.style.color = "rgb(" + colors[i] + ")";
+    b.classList.add("colorSelect");
+    li.appendChild(b);
+  }
 
   document.getElementById("pitch").value = "100";
 
