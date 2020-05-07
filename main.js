@@ -5,7 +5,7 @@ var colors = [[0, 0, 0], [0, 0, 0], [255, 0, 0], [210, 210, 0], [0, 190, 0], [0,
 var colorName = ["", "", "red", "yellow", "green", "sky", "blue", "violet"];
 var canvas, context, width, height;
 var canvas2, context2, height2;
-var holding;
+var holding, selected;
 var mouseX, mouseY;
 
 function euclid(dx, dy) { return Math.sqrt(dx * dx + dy * dy); }
@@ -16,7 +16,6 @@ function init() {
   width = canvas.width;
   height = canvas.height;
 
-
   canvas2 = document.getElementById("canvas2");
   context2 = canvas2.getContext("2d");
   height2 = Math.random() * 200 + 400;
@@ -26,13 +25,14 @@ function init() {
 
   handles = [];
   answers = [];
+  holding = 0;
+  selected = 0;
 
   var x = Math.floor(Math.random() * (width - 24) + 12);
   handles.push([x, 12]);
   answers.push([x, 12]);
-  x = Math.floor(Math.random() * (width - 24) + 12);
-  handles.push([x, height - 12]);
-  answers.push([x, height - 12]);
+  handles.push([Math.floor(Math.random() * (width - 24) + 12), height - 12]);
+  answers.push([Math.floor(Math.random() * (width - 24) + 12), height - 12]);
   while (handles.length < n) {
     var x = Math.floor(Math.random() * (width - 24) + 12);
     var y = Math.floor(Math.random() * (height - 24) + 12);
@@ -51,8 +51,8 @@ function init() {
     event.preventDefault();
     mouseX = event.offsetX;
     mouseY = event.offsetY;
-    for (var i = 2; i < n; i++) {
-      if (euclid(handles[i][0] - mouseX, handles[i][1] - mouseY) < 10) holding = handles[i];
+    for (var i = 1; i < n; i++) {
+      if (euclid(handles[i][0] - mouseX, handles[i][1] - mouseY) < 10) holding = i;
     }
     update();
   };
@@ -63,11 +63,11 @@ function init() {
   };
   canvas.onmouseup = canvas.ontouchend = (event) => {
     event.preventDefault();
-    holding = null;
+    holding = 0;
   };
   let control = document.getElementById("control");
   control.innerText = "";
-  for (var i = 2; i < colors.length; i++) {
+  for (var i = 1; i < colors.length; i++) {
     a = document.createElement("option");
     a.innerText = colorName[i];
     a.style.backgroundColor = "rgb(" + colors[i] + ")";
@@ -76,8 +76,8 @@ function init() {
     control.appendChild(a);
   }
   control.onchange = () => {
-    var select = +document.getElementById("control").value;
-    control.style.backgroundColor = "rgb(" + colors[select] + ")";
+    selected = +document.getElementById("control").value;
+    control.style.backgroundColor = "rgb(" + colors[selected] + ")";
   };
   control.style.backgroundColor = "rgb(" + colors[2] + ")";
 
@@ -137,39 +137,37 @@ function getPitch() {
 }
 
 function left() {
-  var select = +document.getElementById("control").value;
-  handles[select][0] -= getPitch();
-  if (handles[select][0] < 0) handles[select][0] = 0;
+  handles[selected][0] -= getPitch();
+  if (handles[selected][0] < 0) handles[selected][0] = 0;
   navigator.vibrate(100);
   draw();
 }
 function right() {
-  var select = +document.getElementById("control").value;
-  handles[select][0] += getPitch();
-  if (width < handles[select][0]) handles[select][0] = width;
+  handles[selected][0] += getPitch();
+  if (width < handles[selected][0]) handles[selected][0] = width;
   navigator.vibrate(100);
   draw();
 }
 function up() {
-  var select = +document.getElementById("control").value;
-  handles[select][1] -= getPitch();
-  if (handles[select][1] < 0) handles[select][1] = 0;
+  if(selected === 1) return;
+  handles[selected][1] -= getPitch();
+  if (handles[selected][1] < 0) handles[selected][1] = 0;
   navigator.vibrate(100);
   draw();
 }
 function down() {
-  var select = +document.getElementById("control").value;
-  handles[select][1] += getPitch();
-  if (height < handles[select][1]) handles[select][1] = height;
+  if(selected === 1) return;
+  handles[selected][1] += getPitch();
+  if (height < handles[selected][1]) handles[selected][1] = height;
   navigator.vibrate(100);
   draw();
 }
 
 function update() {
-  if (!holding) return;
+  if (holding === 0) return;
 
-  holding[0] = mouseX;
-  holding[1] = mouseY;
+  handles[holding][0] = mouseX;
+  if(holding !== 1) handles[holding][1] = mouseY;
   draw();
 
   setTimeout(update, 16);
@@ -229,7 +227,6 @@ function draw() {
     context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
     context.fill();
   }
-  console.log(JSON.stringify(strokes));
 
   context.fillStyle = "rgba(0, 0, 0, 0.5)";
   strokes.forEach((stroke) => {
