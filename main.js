@@ -162,26 +162,28 @@ function getPitch() {
 }
 
 function left() {
+  if(selected === 0) return;
   handles[selected][0] -= getPitch();
   if (handles[selected][0] < 0) handles[selected][0] = 0;
   navigator.vibrate(100);
   draw();
 }
 function right() {
+  if(selected === 0) return;
   handles[selected][0] += getPitch();
   if (width < handles[selected][0]) handles[selected][0] = width;
   navigator.vibrate(100);
   draw();
 }
 function up() {
-  if(selected === 1) return;
+  if(selected === 0 || selected === 1) return;
   handles[selected][1] -= getPitch();
   if (handles[selected][1] < 0) handles[selected][1] = 0;
   navigator.vibrate(100);
   draw();
 }
 function down() {
-  if(selected === 1) return;
+  if(selected === 0 || selected === 1) return;
   handles[selected][1] += getPitch();
   if (height < handles[selected][1]) handles[selected][1] = height;
   navigator.vibrate(100);
@@ -222,7 +224,7 @@ function test() {
     context.fill();
     sum += euclid(handles[i][0] - answers[i][0], handles[i][1] - answers[i][1]);
   }
-  score = Math.floor(10000 / (1 + 10 * sum / height / (n - 2))) / 100;
+  score = Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
   setTimeout(() => alert(Math.floor(sum * 100) / 100 + "px の誤差\n" + score + "点"), 10);
 }
 
