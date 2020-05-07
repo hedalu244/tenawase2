@@ -84,6 +84,7 @@ function init() {
   */
   
   control = document.getElementById("colors");
+  control.innerHTML = "";
   for (let i = 1; i < colors.length; i++) {
     let li = document.createElement("li");
     control.appendChild(li);
