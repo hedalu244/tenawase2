@@ -288,7 +288,7 @@ function draw() {
       context.arc(answers[i][0], answers[i][1], 10, 0, 2 * Math.PI);
       context.fill();
       
-      context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
+      context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
       context.beginPath();
       context.arc(log[frame][i][0], log[frame][i][1], 10, 0, 2 * Math.PI);
       context.fill();
