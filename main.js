@@ -60,6 +60,7 @@ function init() {
     }
   };
 
+  /*
   canvas.onmousedown = (event) => {
     event.preventDefault();
     mouseX = event.offsetX;
@@ -78,6 +79,7 @@ function init() {
     event.preventDefault();
     holding = 0;
   };
+  */
   /*
   let control = document.getElementById("control");
   control.innerText = "";
