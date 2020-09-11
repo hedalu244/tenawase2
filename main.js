@@ -47,6 +47,15 @@ function init() {
   }
   draw2();
 
+  document.onkeydown = (event) => {
+    switch(event.key) {
+      case "ArrowUp": up(); break;
+      case "ArrowDown": down(); break;
+      case "ArrowLeft": left(); break;
+      case "ArrowRight": right(); break;
+    }
+  }
+
   canvas.onmousedown = (event) => {
     event.preventDefault();
     mouseX = event.offsetX;
