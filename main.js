@@ -1,5 +1,6 @@
 var handles = [];
 var answers = [];
+var log = [];
 var n = 8;
 var colors = [[10, 10, 10], [10, 10, 10], [255, 0, 0], [210, 210, 0], [0, 190, 0], [0, 190, 230], [0, 0, 255], [210, 0, 210]];
 var colorName = ["", "black", "red", "yellow", "green", "sky", "blue", "violet"];
@@ -7,6 +8,8 @@ var canvas, context, width, height;
 var canvas2, context2, height2;
 var holding, selected;
 var mouseX, mouseY;
+var playMode;
+var animationCount;
 
 function euclid(dx, dy) { return Math.sqrt(dx * dx + dy * dy); }
 
@@ -25,6 +28,7 @@ function init() {
 
   handles = [];
   answers = [];
+  log = [];
   holding = 0;
   selected = 0;
 
@@ -48,13 +52,13 @@ function init() {
   draw2();
 
   document.onkeydown = (event) => {
-    switch(event.key) {
+    switch (event.key) {
       case "ArrowUp": up(); break;
       case "ArrowDown": down(); break;
       case "ArrowLeft": left(); break;
       case "ArrowRight": right(); break;
     }
-  }
+  };
 
   canvas.onmousedown = (event) => {
     event.preventDefault();
@@ -91,7 +95,7 @@ function init() {
   };
   control.style.backgroundColor = "rgb(" + colors[2] + ")";
   */
-  
+
   control = document.getElementById("colors");
   control.innerHTML = "";
   for (let i = 1; i < colors.length; i++) {
@@ -161,7 +165,7 @@ function init() {
       strokes.splice(strokeIndex, 1); // remove it; we're done
     });
   }, false);
-  draw();
+  setPlayMode(true);
 }
 
 function getPitch() {
@@ -172,39 +176,43 @@ function getPitch() {
 }
 
 function left() {
-  if(selected === 0) return;
+  if (selected === 0) return;
   handles[selected][0] -= getPitch();
   if (handles[selected][0] < 0) handles[selected][0] = 0;
   navigator.vibrate(100);
-  draw();
+  setPlayMode(true);
+  log.push(JSON.parse(JSON.stringify(handles)));
 }
 function right() {
-  if(selected === 0) return;
+  if (selected === 0) return;
   handles[selected][0] += getPitch();
   if (width < handles[selected][0]) handles[selected][0] = width;
   navigator.vibrate(100);
-  draw();
+  setPlayMode(true);
+  log.push(JSON.parse(JSON.stringify(handles)));
 }
 function up() {
-  if(selected === 0 || selected === 1) return;
+  if (selected === 0 || selected === 1) return;
   handles[selected][1] -= getPitch();
   if (handles[selected][1] < 0) handles[selected][1] = 0;
   navigator.vibrate(100);
-  draw();
+  setPlayMode(true);
+  log.push(JSON.parse(JSON.stringify(handles)));
 }
 function down() {
-  if(selected === 0 || selected === 1) return;
+  if (selected === 0 || selected === 1) return;
   handles[selected][1] += getPitch();
   if (height < handles[selected][1]) handles[selected][1] = height;
   navigator.vibrate(100);
-  draw();
+  setPlayMode(true);
+  log.push(JSON.parse(JSON.stringify(handles)));
 }
 
 function update() {
   if (holding === 0) return;
 
   handles[holding][0] = mouseX;
-  if(holding !== 1) handles[holding][1] = mouseY;
+  if (holding !== 1) handles[holding][1] = mouseY;
   draw();
 
   setTimeout(update, 16);
@@ -220,22 +228,20 @@ function draw2() {
   }
 }
 
-function test() {
-  var sum = 0;
-  context.clearRect(0, 0, width, height);
-  for (var i = 0; i < n; i++) {
-    context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
-    context.beginPath();
-    context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
-    context.fill();
-    context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
-    context.beginPath();
-    context.arc(answers[i][0], answers[i][1], 10, 0, 2 * Math.PI);
-    context.fill();
-    sum += euclid(handles[i][0] - answers[i][0], handles[i][1] - answers[i][1]);
+function setPlayMode(flag) {
+  playMode = flag;
+  if (flag) {
+    document.getElementById("score").innerText = "";
   }
-  score = Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
-  setTimeout(() => alert(Math.floor(sum * 100) / 100 + "px の誤差\n" + score + "点"), 10);
+  else {
+    animationCount = 0;
+    var sum = 0;
+    for (var i = 0; i < n; i++)
+      sum += euclid(handles[i][0] - answers[i][0], handles[i][1] - answers[i][1]);
+    score = Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
+    document.getElementById("score").innerText = score + "点";
+  }
+  draw();
 }
 
 window.onload = init;
@@ -249,7 +255,7 @@ function strokeMove(stroke) {
 }
 function strokeEnd(stroke) {
   draw();
-  switch(isFrick(stroke)) {
+  switch (isFrick(stroke)) {
     case "left": left(); break;
     case "right": right(); break;
     case "up": up(); break;
@@ -257,12 +263,34 @@ function strokeEnd(stroke) {
   }
 }
 function draw() {
-  context.clearRect(0, 0, width, height);
-  for (var i = 0; i < n; i++) {
-    context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
-    context.beginPath();
-    context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
-    context.fill();
+  if (playMode) {
+    context.clearRect(0, 0, width, height);
+    for (var i = 0; i < n; i++) {
+      context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
+      context.beginPath();
+      context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
+      context.fill();
+    }
+  }
+  else {
+    animationCount++;
+    let frame = Math.min(log.length - 1, Math.floor(animationCount / 3) % (log.length + 20));
+    context.clearRect(0, 0, width, height);
+    for (var i = 0; i < n; i++) {
+      context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
+      context.beginPath();
+      context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
+      context.fill();
+      context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
+      context.beginPath();
+      context.arc(answers[i][0], answers[i][1], 10, 0, 2 * Math.PI);
+      context.fill();
+      
+      context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
+      context.beginPath();
+      context.arc(log[frame][i][0], log[frame][i][1], 10, 0, 2 * Math.PI);
+      context.fill();
+    }
   }
 
   context.fillStyle = "rgba(0, 0, 0, 0.5)";
@@ -310,7 +338,9 @@ function draw() {
         break;
     }
   });
+  if(!playMode) requestAnimationFrame(draw);
 }
+
 const flickRange = 50;
 function isFrick(stroke) {
   const dx = stroke.log[stroke.log.length - 1].x - stroke.log[0].x;
