@@ -276,23 +276,26 @@ function draw() {
   }
   else {
     animationCount++;
-    let frame = Math.min(log.length - 1, Math.floor(animationCount / 3) % (log.length + 20));
+    let frame = Math.min(log.length - 1, Math.floor(animationCount / 3));
     context.clearRect(0, 0, width, height);
     for (var i = 0; i < n; i++) {
+      /*
       context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
       context.beginPath();
       context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
+      */
       context.fill();
       context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
       context.beginPath();
       context.arc(answers[i][0], answers[i][1], 10, 0, 2 * Math.PI);
       context.fill();
       
-      context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
+      context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
       context.beginPath();
       context.arc(log[frame][i][0], log[frame][i][1], 10, 0, 2 * Math.PI);
       context.fill();
     }
+    if(!playMode && frame < log.length - 1) requestAnimationFrame(draw);
   }
 
   context.fillStyle = "rgba(0, 0, 0, 0.5)";
@@ -340,7 +343,6 @@ function draw() {
         break;
     }
   });
-  if(!playMode) requestAnimationFrame(draw);
 }
 
 const flickRange = 50;
