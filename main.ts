@@ -1,21 +1,21 @@
-var handles: [number, number][] = [];
-var answers: [number, number][] = [];
-var log: [number, number][][] = [];
+var handles: Coord[] = [];
+var answers: Coord[] = [];
+var log: Coord[][] = [];
 var n = 8;
 var colors = [[10, 10, 10], [10, 10, 10], [255, 0, 0], [210, 210, 0], [0, 190, 0], [0, 190, 230], [0, 0, 255], [210, 0, 210]];
 var colorName = ["", "black", "red", "yellow", "green", "sky", "blue", "violet"];
 var canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, width: number, height: number;
 var canvas2: HTMLCanvasElement, context2: CanvasRenderingContext2D, height2: number;
 var selected: number;
-var playMode: boolean;
+var playMode: "play" | "compare";
 var animationCount: number;
 
 function euclid(dx: number, dy: number): number { return Math.sqrt(dx * dx + dy * dy); }
 
-function calcScore(handles: [number, number][], answers: [number, number][]) {
+function calcScore(handles: Coord[], answers: Coord[]) {
     var sum = 0;
     for (var i = 0; i < n; i++)
-      sum += euclid(handles[i][0] - answers[i][0], handles[i][1] - answers[i][1]);
+      sum += euclid(handles[i].x - answers[i].x, handles[i].y - answers[i].y);
     return Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
   }
 
@@ -38,21 +38,21 @@ function init() {
   selected = 0;
 
   var x = Math.floor(Math.random() * (width - 24) + 12);
-  handles.push([x, 12]);
-  answers.push([x, 12]);
-  handles.push([Math.floor(Math.random() * (width - 24) + 12), height - 12]);
-  answers.push([Math.floor(Math.random() * (width - 24) + 12), height - 12]);
+  handles.push({x, y:12});
+  answers.push({x, y:12});
+  handles.push({x:Math.floor(Math.random() * (width - 24) + 12), y:height - 12});
+  answers.push({x:Math.floor(Math.random() * (width - 24) + 12), y:height - 12});
   while (handles.length < n) {
     var x = Math.floor(Math.random() * (width - 24) + 12);
     var y = Math.floor(Math.random() * (height - 24) + 12);
-    if (handles.every(a => (50 < euclid(a[0] - x, a[1] - y))))
-      handles.push([x, y]);
+    if (handles.every(a => (50 < euclid(a.x - x, a.y - y))))
+      handles.push({x, y});
   }
   while (answers.length < n) {
     var x = Math.floor(Math.random() * (width - 24) + 12);
     var y = Math.floor(Math.random() * (height - 24) + 12);
-    if (answers.every(a => (50 < euclid(a[0] - x, a[1] - y))))
-      answers.push([x, y]);
+    if (answers.every(a => (50 < euclid(a.x - x, a.y - y))))
+      answers.push({x, y});
   }
   log.push([...handles]);
   draw2();
@@ -135,7 +135,7 @@ function init() {
       strokes.splice(strokeIndex, 1); // remove it; we're done
     });
   }, false);
-  setPlayMode(true);
+  setPlayMode("play");
 }
 
 function getPitch() {
@@ -147,34 +147,34 @@ function getPitch() {
 
 function left() {
   if (selected === 0) return;
-  handles[selected][0] -= getPitch();
-  if (handles[selected][0] < 0) handles[selected][0] = 0;
+  handles[selected].x -= getPitch();
+  if (handles[selected].x < 0) handles[selected].x = 0;
   navigator.vibrate(100);
-  setPlayMode(true);
+  setPlayMode("play");
   log.push(JSON.parse(JSON.stringify(handles)));
 }
 function right() {
   if (selected === 0) return;
-  handles[selected][0] += getPitch();
-  if (width < handles[selected][0]) handles[selected][0] = width;
+  handles[selected].x += getPitch();
+  if (width < handles[selected].x) handles[selected].x = width;
   navigator.vibrate(100);
-  setPlayMode(true);
+  setPlayMode("play");
   log.push(JSON.parse(JSON.stringify(handles)));
 }
 function up() {
   if (selected === 0 || selected === 1) return;
-  handles[selected][1] -= getPitch();
-  if (handles[selected][1] < 0) handles[selected][1] = 0;
+  handles[selected].y -= getPitch();
+  if (handles[selected].y < 0) handles[selected].y = 0;
   navigator.vibrate(100);
-  setPlayMode(true);
+  setPlayMode("play");
   log.push(JSON.parse(JSON.stringify(handles)));
 }
 function down() {
   if (selected === 0 || selected === 1) return;
-  handles[selected][1] += getPitch();
-  if (height < handles[selected][1]) handles[selected][1] = height;
+  handles[selected].y += getPitch();
+  if (height < handles[selected].y) handles[selected].y = height;
   navigator.vibrate(100);
-  setPlayMode(true);
+  setPlayMode("play");
   log.push(JSON.parse(JSON.stringify(handles)));
 }
 
@@ -183,20 +183,19 @@ function draw2() {
   for (var i = 0; i < n; i++) {
     context2.fillStyle = "rgba(" + colors[i] + ", 0.8)";
     context2.beginPath();
-    context2.arc(answers[i][0] * height2 / height, answers[i][1] * height2 / height, 10 * height2 / height, 0, 2 * Math.PI);
+    context2.arc(answers[i].x * height2 / height, answers[i].y * height2 / height, 10 * height2 / height, 0, 2 * Math.PI);
     context2.fill();
   }
 }
 
-function setPlayMode(flag: boolean) {
+function setPlayMode(flag: "play" | "compare") {
   playMode = flag;
-  if (flag) {
+  if (flag === "play") {
     document.getElementById("score").innerText = "";
   }
   else {
     animationCount = 0;
-    let score = calcScore(handles);
-    document.getElementById("score").innerText = score + "点";
+    document.getElementById("score").innerText = calcScore(handles, answers) + "点";
   }
   draw();
 }
@@ -233,7 +232,7 @@ function draw() {
     for (var i = 0; i < n; i++) {
       context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
       context.beginPath();
-      context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
+      context.arc(handles[i].x, handles[i].y, 10, 0, 2 * Math.PI);
       context.fill();
     }
   }
@@ -246,16 +245,16 @@ function draw() {
       context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
       context.beginPath();
       context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
-      */
       context.fill();
+      */
       context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
       context.beginPath();
-      context.arc(answers[i][0], answers[i][1], 10, 0, 2 * Math.PI);
+      context.arc(answers[i].x, answers[i].y, 10, 0, 2 * Math.PI);
       context.fill();
       
       context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
       context.beginPath();
-      context.arc(log[frame][i][0], log[frame][i][1], 10, 0, 2 * Math.PI);
+      context.arc(log[frame][i].x, log[frame][i].y, 10, 0, 2 * Math.PI);
       context.fill();
     }
     if(!playMode && frame < log.length - 1) requestAnimationFrame(draw);
