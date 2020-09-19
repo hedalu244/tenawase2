@@ -11,12 +11,27 @@ var canvas, context;
 var selected;
 var playMode;
 var animationCount = 0;
+var timer = 0;
 function euclid(dx, dy) { return Math.sqrt(dx * dx + dy * dy); }
 function calcScore(handles, answers) {
     var sum = 0;
     for (var i = 0; i < n; i++)
         sum += euclid(handles[i].x - answers[i].x, handles[i].y - answers[i].y);
     return Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
+}
+function countUpTimer() {
+    if (playMode !== "play")
+        return;
+    timer++;
+    document.getElementById("timer").innerText = pad("" + Math.floor(timer / 60)) + ":" + pad("" + timer % 60);
+    setTimeout(countUpTimer, 1000);
+    function pad(s) {
+        if (s.length == 0)
+            return "00";
+        if (s.length == 1)
+            return "0" + s;
+        return s;
+    }
 }
 function init() {
     canvas = document.getElementById("canvas");
@@ -33,6 +48,7 @@ function init() {
     answers = [];
     log = [];
     selected = 0;
+    timer = 0;
     var x = Math.floor(Math.random() * (width - 24) + 12);
     handles.push({ x, y: 12 });
     answers.push({ x, y: 12 });
@@ -94,6 +110,7 @@ function init() {
         li.appendChild(b);
     }
     document.getElementById("pitch").value = "100";
+    document.getElementById("timer").innerText = "00:00";
     canvas.addEventListener("touchstart", (event) => {
         event.preventDefault();
         const rect = canvas.getBoundingClientRect();
@@ -137,7 +154,7 @@ function init() {
             strokes.splice(strokeIndex, 1); // remove it; we're done
         });
     }, false);
-    setPlayMode("play");
+    setPlayMode("ready");
 }
 function getPitch() {
     var x = +document.getElementById("pitch").value * 0.01;
@@ -194,11 +211,14 @@ function draw2() {
         context2.fill();
     }
 }
-function setPlayMode(flag) {
-    playMode = flag;
-    if (flag === "compare") {
-        animationCount = 0;
+function setPlayMode(mode) {
+    if (mode == "play" && playMode !== "play") {
+        playMode = mode;
+        countUpTimer();
     }
+    if (mode === "compare")
+        animationCount = 0;
+    playMode = mode;
     draw();
 }
 window.onload = init;
@@ -227,7 +247,7 @@ function strokeEnd(stroke) {
 }
 function draw() {
     switch (playMode) {
-        case "play":
+        case "ready":
         case "play":
             {
                 context.clearRect(0, 0, width, height);

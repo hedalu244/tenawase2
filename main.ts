@@ -8,8 +8,9 @@ var canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, width: number,
 var canvas2: HTMLCanvasElement, context2: CanvasRenderingContext2D, height2: number;
 var canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
 var selected: number;
-var playMode: "play" | "compare";
+var playMode: "ready" | "play" | "compare";
 var animationCount: number = 0;
+var timer: number = 0;
 
 function euclid(dx: number, dy: number): number { return Math.sqrt(dx * dx + dy * dy); }
 
@@ -18,6 +19,18 @@ function calcScore(handles: Coord[], answers: Coord[]) {
     for (var i = 0; i < n; i++)
         sum += euclid(handles[i].x - answers[i].x, handles[i].y - answers[i].y);
     return Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
+}
+
+function countUpTimer() {
+    if (playMode !== "play") return;
+    timer++;
+    document.getElementById("timer").innerText = pad("" + Math.floor(timer / 60)) + ":" + pad("" + timer % 60);
+    setTimeout(countUpTimer, 1000);
+    function pad(s: string): string {
+        if (s.length == 0) return "00";
+        if (s.length == 1) return "0" + s;
+        return s;
+    }
 }
 
 function init() {
@@ -37,6 +50,7 @@ function init() {
     answers = [];
     log = [];
     selected = 0;
+    timer = 0;
 
     var x = Math.floor(Math.random() * (width - 24) + 12);
     handles.push({ x, y: 12 });
@@ -92,6 +106,7 @@ function init() {
     }
 
     document.getElementById("pitch").value = "100";
+    document.getElementById("timer").innerText = "00:00";
 
     canvas.addEventListener("touchstart", (event) => {
         event.preventDefault();
@@ -136,7 +151,7 @@ function init() {
             strokes.splice(strokeIndex, 1); // remove it; we're done
         });
     }, false);
-    setPlayMode("play");
+    setPlayMode("ready");
 }
 
 function getPitch() {
@@ -189,11 +204,15 @@ function draw2() {
     }
 }
 
-function setPlayMode(flag: "play" | "compare") {
-    playMode = flag;
-    if (flag === "compare") {
-        animationCount = 0;
+function setPlayMode(mode: "ready" | "play" | "compare") {
+    if (mode == "play" && playMode !== "play") {
+        playMode = mode;
+        countUpTimer();
     }
+    if (mode === "compare") animationCount = 0;
+
+    playMode = mode;
+
     draw();
 }
 
@@ -225,7 +244,7 @@ function strokeEnd(stroke: Stroke) {
 }
 function draw() {
     switch (playMode) {
-        case "play":
+        case "ready":
         case "play": {
             context.clearRect(0, 0, width, height);
             for (var i = 0; i < n; i++) {
