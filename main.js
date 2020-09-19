@@ -7,6 +7,7 @@ var colors = [[10, 10, 10], [10, 10, 10], [255, 0, 0], [210, 210, 0], [0, 190, 0
 var colorName = ["", "black", "red", "yellow", "green", "sky", "blue", "violet"];
 var canvas, context, width, height;
 var canvas2, context2, height2;
+var graphCanvas, graphContext;
 var selected;
 var playMode;
 var animationCount;
@@ -28,6 +29,8 @@ function init() {
     canvas2.height = height2;
     canvas2.width = height2 * width / height;
     canvas2.style.marginLeft = (Math.random() * (window.innerWidth - canvas2.width)) + "px";
+    graphCanvas = document.getElementById("graph");
+    graphContext = graphCanvas.getContext("2d");
     handles = [];
     answers = [];
     log = [];
@@ -254,6 +257,57 @@ function draw() {
             context.arc(log[frame][i].x, log[frame][i].y, 10, 0, 2 * Math.PI);
             context.fill();
         }
+        function graphArea(x, y) {
+            return [x * graphCanvas.width, 10 + y * (graphCanvas.height - 10)];
+        }
+        graphContext.clearRect(0, 0, graphContext.canvas.width, graphContext.canvas.height);
+        graphContext.strokeStyle = "gray";
+        graphContext.beginPath();
+        graphContext.moveTo(...graphArea(0, 0));
+        graphContext.lineTo(...graphArea(1, 0));
+        graphContext.stroke();
+        graphContext.strokeStyle = "gray";
+        graphContext.beginPath();
+        graphContext.moveTo(...graphArea(0, 0.1));
+        graphContext.lineTo(...graphArea(1, 0.1));
+        graphContext.stroke();
+        graphContext.strokeStyle = "gray";
+        graphContext.beginPath();
+        graphContext.moveTo(...graphArea(0, 0.2));
+        graphContext.lineTo(...graphArea(1, 0.2));
+        graphContext.stroke();
+        graphContext.strokeStyle = "gray";
+        graphContext.beginPath();
+        graphContext.moveTo(...graphArea(0, 1));
+        graphContext.lineTo(...graphArea(1, 1));
+        graphContext.stroke();
+        graphContext.strokeStyle = "black";
+        graphContext.beginPath();
+        graphContext.moveTo(...graphArea(0, 1));
+        let highest = 0;
+        let score = 0;
+        for (var i = 0; i <= frame; i++) {
+            score = calcScore(log[i], answers);
+            highest = Math.max(highest, score);
+            graphContext.lineTo(...graphArea(i / log.length, 1 - score / 100));
+        }
+        graphContext.stroke();
+        graphContext.strokeStyle = "green";
+        graphContext.beginPath();
+        graphContext.moveTo(...graphArea(0, 1 - score / 100));
+        graphContext.lineTo(...graphArea(1, 1 - score / 100));
+        graphContext.stroke();
+        graphContext.strokeStyle = "red";
+        graphContext.beginPath();
+        graphContext.moveTo(...graphArea(0, 1 - highest / 100));
+        graphContext.lineTo(...graphArea(1, 1 - highest / 100));
+        graphContext.stroke();
+        graphContext.font = "40px sans-serif";
+        graphContext.textAlign = "center";
+        graphContext.fillStyle = "red";
+        graphContext.fillText("" + highest, graphCanvas.width / 2, 50);
+        graphContext.fillStyle = "green";
+        graphContext.fillText("" + score, graphCanvas.width / 2, 100);
         if (!playMode && frame < log.length - 1)
             requestAnimationFrame(draw);
     }
