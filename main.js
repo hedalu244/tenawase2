@@ -49,6 +49,7 @@ function init() {
     if (answers.every(a => (50 < euclid(a[0] - x, a[1] - y))))
       answers.push([x, y]);
   }
+  log.push([...handles]);
   draw2();
 
   document.onkeydown = (event) => {
@@ -237,13 +238,17 @@ function setPlayMode(flag) {
   }
   else {
     animationCount = 0;
-    var sum = 0;
-    for (var i = 0; i < n; i++)
-      sum += euclid(handles[i][0] - answers[i][0], handles[i][1] - answers[i][1]);
-    score = Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
+    score = calcScore(handles);
     document.getElementById("score").innerText = score + "点";
   }
   draw();
+}
+
+function calcScore(handles) {
+  var sum = 0;
+  for (var i = 0; i < n; i++)
+    sum += euclid(handles[i][0] - answers[i][0], handles[i][1] - answers[i][1]);
+  return Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
 }
 
 window.onload = init;
