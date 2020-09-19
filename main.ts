@@ -9,7 +9,7 @@ var canvas2: HTMLCanvasElement, context2: CanvasRenderingContext2D, height2: num
 var canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
 var selected: number;
 var playMode: "play" | "compare";
-var animationCount = 0: number;
+var animationCount: number = 0;
 
 function euclid(dx: number, dy: number): number { return Math.sqrt(dx * dx + dy * dy); }
 
@@ -224,94 +224,89 @@ function strokeEnd(stroke: Stroke) {
     }
 }
 function draw() {
-    if (playMode == "play") {
-        context.clearRect(0, 0, width, height);
-        for (var i = 0; i < n; i++) {
-            context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
+    switch (playMode) {
+        case "play":
+        case "play": {
+            context.clearRect(0, 0, width, height);
+            for (var i = 0; i < n; i++) {
+                context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
+                context.beginPath();
+                context.arc(handles[i].x, handles[i].y, 10, 0, 2 * Math.PI);
+                context.fill();
+            }
+        } break;
+        case "compare": {
+            animationCount++;
+            let frame = Math.min(log.length - 1, Math.floor(animationCount / 3));
+            context.clearRect(0, 0, width, height);
+
+            function graphArea(x: number, y: number): [number, number] {
+                return [x * canvas.width, y * (canvas.height)];
+            }
+            context.strokeStyle = "gray";
             context.beginPath();
-            context.arc(handles[i].x, handles[i].y, 10, 0, 2 * Math.PI);
-            context.fill();
-        }
-    }
-    else {
-        animationCount++;
-        let frame = Math.min(log.length - 1, Math.floor(animationCount / 3));
-        context.clearRect(0, 0, width, height);
-        for (var i = 0; i < n; i++) {
-            /*
-            context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
+            context.moveTo(...graphArea(0, 0.1));
+            context.lineTo(...graphArea(1, 0.1));
+            context.stroke();
             context.beginPath();
-            context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
-            context.fill();
-            */
-            context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
+            context.moveTo(...graphArea(0, 0.2));
+            context.lineTo(...graphArea(1, 0.2));
+            context.stroke();
             context.beginPath();
-            context.arc(answers[i].x, answers[i].y, 10, 0, 2 * Math.PI);
-            context.fill();
+            context.moveTo(...graphArea(0, 0.3));
+            context.lineTo(...graphArea(1, 0.3));
+            context.stroke();
 
-            context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
+            context.strokeStyle = "black";
             context.beginPath();
-            context.arc(log[frame][i].x, log[frame][i].y, 10, 0, 2 * Math.PI);
-            context.fill();
-        }
+            context.moveTo(...graphArea(0, 1));
+            let highest = 0;
+            let score = 0;
+            for (var i = 0; i <= frame; i++) {
+                score = calcScore(log[i], answers);
+                highest = Math.max(highest, score);
+                context.lineTo(...graphArea(i / log.length, 1 - score / 100));
+            }
+            context.stroke();
 
-        function graphArea(x: number, y: number): [number, number] {
-            return [x * canvas.width, 10 + y * (canvas.height - 10)];
-        }
-        context.strokeStyle = "gray";
-        context.beginPath();
-        context.moveTo(...graphArea(0, 0));
-        context.lineTo(...graphArea(1, 0));
-        context.stroke();
-        context.strokeStyle = "gray";
-        context.beginPath();
-        context.moveTo(...graphArea(0, 0.1));
-        context.lineTo(...graphArea(1, 0.1));
-        context.stroke();
-        context.strokeStyle = "gray";
-        context.beginPath();
-        context.moveTo(...graphArea(0, 0.2));
-        context.lineTo(...graphArea(1, 0.2));
-        context.stroke();
-        context.strokeStyle = "gray";
-        context.beginPath();
-        context.moveTo(...graphArea(0, 1));
-        context.lineTo(...graphArea(1, 1));
-        context.stroke();
+            context.strokeStyle = "red";
+            context.beginPath();
+            context.moveTo(...graphArea(0, 1 - highest / 100));
+            context.lineTo(...graphArea(1, 1 - highest / 100));
+            context.stroke();
+            context.strokeStyle = "green";
+            context.beginPath();
+            context.moveTo(...graphArea(0, 1 - score / 100));
+            context.lineTo(...graphArea(1, 1 - score / 100));
+            context.stroke();
 
-        context.strokeStyle = "black";
-        context.beginPath();
-        context.moveTo(...graphArea(0, 1));
-        let highest = 0;
-        let score = 0;
-        for (var i = 0; i <= frame; i++) {
-            score = calcScore(log[i], answers);
-            highest = Math.max(highest, score);
-            context.lineTo(...graphArea(i / log.length, 1 - score / 100));
-        }
-        context.stroke();
-        context.strokeStyle = "green";
-        context.beginPath();
-        context.moveTo(...graphArea(0, 1 - score / 100));
-        context.lineTo(...graphArea(1, 1 - score / 100));
-        context.stroke();
+            context.font = "100px sans-serif";
+            context.textAlign = "center";
+            if (frame === log.length - 1) {
+                context.fillStyle = "gray";
+                context.fillText("" + score, canvas.width / 2, 200);
+            }
 
-        context.strokeStyle = "red";
-        context.beginPath();
-        context.moveTo(...graphArea(0, 1 - highest / 100));
-        context.lineTo(...graphArea(1, 1 - highest / 100));
-        context.stroke();
+            for (var i = 0; i < n; i++) {
+                /*
+                context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
+                context.beginPath();
+                context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
+                context.fill();
+                */
+                context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
+                context.beginPath();
+                context.arc(answers[i].x, answers[i].y, 10, 0, 2 * Math.PI);
+                context.fill();
 
-        context.font = "40px sans-serif";
-        context.textAlign = "center";
-        if (frame === log.length - 1) {
-            context.fillStyle = "green";
-            context.fillText("" + score, canvas.width / 2, 50);
-        }
+                context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
+                context.beginPath();
+                context.arc(log[frame][i].x, log[frame][i].y, 10, 0, 2 * Math.PI);
+                context.fill();
+            }
 
-
-
-        if (frame < log.length - 1) requestAnimationFrame(draw);
+            if (frame < log.length - 1) requestAnimationFrame(draw);
+        } break;
     }
 
     context.fillStyle = "rgba(0, 0, 0, 0.5)";
