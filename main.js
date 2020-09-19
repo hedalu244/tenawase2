@@ -7,10 +7,10 @@ var colors = [[10, 10, 10], [10, 10, 10], [255, 0, 0], [210, 210, 0], [0, 190, 0
 var colorName = ["", "black", "red", "yellow", "green", "sky", "blue", "violet"];
 var canvas, context, width, height;
 var canvas2, context2, height2;
-var graphCanvas, graphContext;
+var canvas, context;
 var selected;
 var playMode;
-var animationCount;
+var animationCount = 0, number;
 function euclid(dx, dy) { return Math.sqrt(dx * dx + dy * dy); }
 function calcScore(handles, answers) {
     var sum = 0;
@@ -29,8 +29,6 @@ function init() {
     canvas2.height = height2;
     canvas2.width = height2 * width / height;
     canvas2.style.marginLeft = (Math.random() * (window.innerWidth - canvas2.width)) + "px";
-    graphCanvas = document.getElementById("graph");
-    graphContext = graphCanvas.getContext("2d");
     handles = [];
     answers = [];
     log = [];
@@ -52,20 +50,24 @@ function init() {
         if (answers.every(a => (50 < euclid(a.x - x, a.y - y))))
             answers.push({ x, y });
     }
-    log.push([...handles]);
+    log.push(JSON.parse(JSON.stringify(handles)));
     draw2();
     document.onkeydown = (event) => {
         switch (event.key) {
             case "ArrowUp":
+                event.preventDefault();
                 up();
                 break;
             case "ArrowDown":
+                event.preventDefault();
                 down();
                 break;
             case "ArrowLeft":
+                event.preventDefault();
                 left();
                 break;
             case "ArrowRight":
+                event.preventDefault();
                 right();
                 break;
         }
@@ -194,12 +196,8 @@ function draw2() {
 }
 function setPlayMode(flag) {
     playMode = flag;
-    if (flag === "play") {
-        document.getElementById("score").innerText = "";
-    }
-    else {
+    if (flag === "compare") {
         animationCount = 0;
-        document.getElementById("score").innerText = calcScore(handles, answers) + "点";
     }
     draw();
 }
@@ -228,7 +226,7 @@ function strokeEnd(stroke) {
     }
 }
 function draw() {
-    if (playMode) {
+    if (playMode == "play") {
         context.clearRect(0, 0, width, height);
         for (var i = 0; i < n; i++) {
             context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
@@ -258,57 +256,56 @@ function draw() {
             context.fill();
         }
         function graphArea(x, y) {
-            return [x * graphCanvas.width, 10 + y * (graphCanvas.height - 10)];
+            return [x * canvas.width, 10 + y * (canvas.height - 10)];
         }
-        graphContext.clearRect(0, 0, graphContext.canvas.width, graphContext.canvas.height);
-        graphContext.strokeStyle = "gray";
-        graphContext.beginPath();
-        graphContext.moveTo(...graphArea(0, 0));
-        graphContext.lineTo(...graphArea(1, 0));
-        graphContext.stroke();
-        graphContext.strokeStyle = "gray";
-        graphContext.beginPath();
-        graphContext.moveTo(...graphArea(0, 0.1));
-        graphContext.lineTo(...graphArea(1, 0.1));
-        graphContext.stroke();
-        graphContext.strokeStyle = "gray";
-        graphContext.beginPath();
-        graphContext.moveTo(...graphArea(0, 0.2));
-        graphContext.lineTo(...graphArea(1, 0.2));
-        graphContext.stroke();
-        graphContext.strokeStyle = "gray";
-        graphContext.beginPath();
-        graphContext.moveTo(...graphArea(0, 1));
-        graphContext.lineTo(...graphArea(1, 1));
-        graphContext.stroke();
-        graphContext.strokeStyle = "black";
-        graphContext.beginPath();
-        graphContext.moveTo(...graphArea(0, 1));
+        context.strokeStyle = "gray";
+        context.beginPath();
+        context.moveTo(...graphArea(0, 0));
+        context.lineTo(...graphArea(1, 0));
+        context.stroke();
+        context.strokeStyle = "gray";
+        context.beginPath();
+        context.moveTo(...graphArea(0, 0.1));
+        context.lineTo(...graphArea(1, 0.1));
+        context.stroke();
+        context.strokeStyle = "gray";
+        context.beginPath();
+        context.moveTo(...graphArea(0, 0.2));
+        context.lineTo(...graphArea(1, 0.2));
+        context.stroke();
+        context.strokeStyle = "gray";
+        context.beginPath();
+        context.moveTo(...graphArea(0, 1));
+        context.lineTo(...graphArea(1, 1));
+        context.stroke();
+        context.strokeStyle = "black";
+        context.beginPath();
+        context.moveTo(...graphArea(0, 1));
         let highest = 0;
         let score = 0;
         for (var i = 0; i <= frame; i++) {
             score = calcScore(log[i], answers);
             highest = Math.max(highest, score);
-            graphContext.lineTo(...graphArea(i / log.length, 1 - score / 100));
+            context.lineTo(...graphArea(i / log.length, 1 - score / 100));
         }
-        graphContext.stroke();
-        graphContext.strokeStyle = "green";
-        graphContext.beginPath();
-        graphContext.moveTo(...graphArea(0, 1 - score / 100));
-        graphContext.lineTo(...graphArea(1, 1 - score / 100));
-        graphContext.stroke();
-        graphContext.strokeStyle = "red";
-        graphContext.beginPath();
-        graphContext.moveTo(...graphArea(0, 1 - highest / 100));
-        graphContext.lineTo(...graphArea(1, 1 - highest / 100));
-        graphContext.stroke();
-        graphContext.font = "40px sans-serif";
-        graphContext.textAlign = "center";
-        graphContext.fillStyle = "red";
-        graphContext.fillText("" + highest, graphCanvas.width / 2, 50);
-        graphContext.fillStyle = "green";
-        graphContext.fillText("" + score, graphCanvas.width / 2, 100);
-        if (!playMode && frame < log.length - 1)
+        context.stroke();
+        context.strokeStyle = "green";
+        context.beginPath();
+        context.moveTo(...graphArea(0, 1 - score / 100));
+        context.lineTo(...graphArea(1, 1 - score / 100));
+        context.stroke();
+        context.strokeStyle = "red";
+        context.beginPath();
+        context.moveTo(...graphArea(0, 1 - highest / 100));
+        context.lineTo(...graphArea(1, 1 - highest / 100));
+        context.stroke();
+        context.font = "40px sans-serif";
+        context.textAlign = "center";
+        if (frame === log.length - 1) {
+            context.fillStyle = "green";
+            context.fillText("" + score, canvas.width / 2, 50);
+        }
+        if (frame < log.length - 1)
             requestAnimationFrame(draw);
     }
     context.fillStyle = "rgba(0, 0, 0, 0.5)";
