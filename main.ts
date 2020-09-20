@@ -22,6 +22,8 @@ function calcScore(handles: Coord[], answers: Coord[]) {
 }
 
 function countUpTimer() {
+    log.push(JSON.parse(JSON.stringify(handles)));
+
     if (playMode !== "play") return;
     timer++;
     document.getElementById("timer").innerText = pad("" + Math.floor(timer / 60)) + ":" + pad("" + timer % 60);
@@ -167,7 +169,6 @@ function left() {
     if (handles[selected].x < 0) handles[selected].x = 0;
     navigator.vibrate(100);
     setPlayMode("play");
-    log.push(JSON.parse(JSON.stringify(handles)));
 }
 function right() {
     if (selected === 0) return;
@@ -175,7 +176,6 @@ function right() {
     if (width < handles[selected].x) handles[selected].x = width;
     navigator.vibrate(100);
     setPlayMode("play");
-    log.push(JSON.parse(JSON.stringify(handles)));
 }
 function up() {
     if (selected === 0 || selected === 1) return;
@@ -183,7 +183,6 @@ function up() {
     if (handles[selected].y < 0) handles[selected].y = 0;
     navigator.vibrate(100);
     setPlayMode("play");
-    log.push(JSON.parse(JSON.stringify(handles)));
 }
 function down() {
     if (selected === 0 || selected === 1) return;
@@ -191,7 +190,6 @@ function down() {
     if (height < handles[selected].y) handles[selected].y = height;
     navigator.vibrate(100);
     setPlayMode("play");
-    log.push(JSON.parse(JSON.stringify(handles)));
 }
 
 function draw2() {
@@ -299,12 +297,10 @@ function draw() {
             context.lineTo(...graphArea(1, 1 - score / 100));
             context.stroke();
 
-            context.font = "100px sans-serif";
+            context.font = "140px sans-serif";
             context.textAlign = "center";
-            if (frame === log.length - 1) {
-                context.fillStyle = "gray";
-                context.fillText("" + score, canvas.width / 2, 200);
-            }
+            context.fillStyle = "lightgray";
+            context.fillText("" + calcScore(handles, answers), canvas.width / 2, 200);
 
             for (var i = 0; i < n; i++) {
                 /*

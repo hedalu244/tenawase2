@@ -20,6 +20,7 @@ function calcScore(handles, answers) {
     return Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
 }
 function countUpTimer() {
+    log.push(JSON.parse(JSON.stringify(handles)));
     if (playMode !== "play")
         return;
     timer++;
@@ -170,7 +171,6 @@ function left() {
         handles[selected].x = 0;
     navigator.vibrate(100);
     setPlayMode("play");
-    log.push(JSON.parse(JSON.stringify(handles)));
 }
 function right() {
     if (selected === 0)
@@ -180,7 +180,6 @@ function right() {
         handles[selected].x = width;
     navigator.vibrate(100);
     setPlayMode("play");
-    log.push(JSON.parse(JSON.stringify(handles)));
 }
 function up() {
     if (selected === 0 || selected === 1)
@@ -190,7 +189,6 @@ function up() {
         handles[selected].y = 0;
     navigator.vibrate(100);
     setPlayMode("play");
-    log.push(JSON.parse(JSON.stringify(handles)));
 }
 function down() {
     if (selected === 0 || selected === 1)
@@ -200,7 +198,6 @@ function down() {
         handles[selected].y = height;
     navigator.vibrate(100);
     setPlayMode("play");
-    log.push(JSON.parse(JSON.stringify(handles)));
 }
 function draw2() {
     context2.clearRect(0, 0, width, height);
@@ -301,12 +298,10 @@ function draw() {
                 context.moveTo(...graphArea(0, 1 - score / 100));
                 context.lineTo(...graphArea(1, 1 - score / 100));
                 context.stroke();
-                context.font = "100px sans-serif";
+                context.font = "140px sans-serif";
                 context.textAlign = "center";
-                if (frame === log.length - 1) {
-                    context.fillStyle = "gray";
-                    context.fillText("" + score, canvas.width / 2, 200);
-                }
+                context.fillStyle = "lightgray";
+                context.fillText("" + calcScore(handles, answers), canvas.width / 2, 200);
                 for (var i = 0; i < n; i++) {
                     /*
                     context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
