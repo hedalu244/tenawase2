@@ -261,6 +261,10 @@ function draw() {
                 animationCount++;
                 let frame = Math.min(log.length - 1, Math.floor(animationCount / 3));
                 context.clearRect(0, 0, width, height);
+                context.font = "140px sans-serif";
+                context.textAlign = "center";
+                context.fillStyle = "lightgray";
+                context.fillText("" + calcScore(handles, answers), canvas.width / 2, 200);
                 function graphArea(x, y) {
                     return [x * canvas.width, y * (canvas.height)];
                 }
@@ -298,10 +302,8 @@ function draw() {
                 context.moveTo(...graphArea(0, 1 - score / 100));
                 context.lineTo(...graphArea(1, 1 - score / 100));
                 context.stroke();
-                context.font = "140px sans-serif";
-                context.textAlign = "center";
-                context.fillStyle = "lightgray";
-                context.fillText("" + calcScore(handles, answers), canvas.width / 2, 200);
+                context.fillStyle = "rgba(255, 255, 255, 0.2)";
+                context.fillRect(0, 0, width, height);
                 for (var i = 0; i < n; i++) {
                     /*
                     context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
