@@ -2,12 +2,9 @@ var handles: Coord[] = [];
 var answers: Coord[] = [];
 var log: Coord[][] = [];
 var n = 8;
-var colors = [[10, 10, 10], [10, 10, 10], [255, 0, 0], [210, 210, 0], [0, 190, 0], [0, 190, 230], [0, 0, 255], [210, 0, 210]];
-var colorName = ["", "black", "red", "yellow", "green", "sky", "blue", "violet"];
+var colors = [[10, 10, 10], [255, 0, 0], [210, 210, 0], [0, 190, 0], [0, 190, 230], [0, 0, 255], [210, 0, 210], [10, 10, 10]];
 var canvas: HTMLCanvasElement, context: CanvasRenderingContext2D, width: number, height: number;
 var canvas2: HTMLCanvasElement, context2: CanvasRenderingContext2D, height2: number;
-var canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
-var selected: number;
 var playMode: "ready" | "play" | "compare";
 var animationCount: number = 0;
 var timer: number = 0;
@@ -85,7 +82,7 @@ function init() {
 
     let control = document.getElementById("colors");
     control.innerHTML = "";
-    for (let i = 1; i < colors.length; i++) {
+    for (let i = 0; i < colors.length; i++) {
         let li = document.createElement("li");
         control.appendChild(li);
 
@@ -94,10 +91,6 @@ function init() {
         a.id = "color" + i;
         a.name = "colors";
         li.appendChild(a);
-        a.onchange = () => {
-            selected = i;
-            console.log(i);
-        };
 
         let b = document.createElement("label");
         b.setAttribute("for", a.id);
@@ -162,30 +155,36 @@ function getPitch() {
     var b = 3;
     return a * (Math.exp(b * x) - 1) / b + 1;
 }
+function getSelected() {
+    return Array.from(document.getElementsByName("colors")).findIndex(item =>
+        item instanceof HTMLInputElement && item.checked);
+}
 
 function left() {
-    if (selected === 0) return;
+    const selected = getSelected();
     handles[selected].x -= getPitch();
     if (handles[selected].x < 0) handles[selected].x = 0;
     navigator.vibrate(100);
     setPlayMode("play");
 }
 function right() {
-    if (selected === 0) return;
+    const selected = getSelected();
     handles[selected].x += getPitch();
     if (width < handles[selected].x) handles[selected].x = width;
     navigator.vibrate(100);
     setPlayMode("play");
 }
 function up() {
-    if (selected === 0 || selected === 1) return;
+    const selected = getSelected();
+    if (selected === 0 || selected === n - 1) return;
     handles[selected].y -= getPitch();
     if (handles[selected].y < 0) handles[selected].y = 0;
     navigator.vibrate(100);
     setPlayMode("play");
 }
 function down() {
-    if (selected === 0 || selected === 1) return;
+    const selected = getSelected();
+    if (selected === 0 || selected === n - 1) return;
     handles[selected].y += getPitch();
     if (height < handles[selected].y) handles[selected].y = height;
     navigator.vibrate(100);
