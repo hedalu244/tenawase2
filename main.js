@@ -216,12 +216,30 @@ function draw2() {
     }
 }
 function setPlayMode(mode) {
+    let compareButton = document.getElementById("compare");
+    let backButton = document.getElementById("back");
+    let nextButton = document.getElementById("next");
+    if (mode !== "compare") {
+        compareButton.disabled = false;
+        compareButton.style.display = "inline-block";
+        backButton.disabled = true;
+        backButton.style.display = "none";
+        nextButton.disabled = true;
+        nextButton.style.display = "none";
+    }
     if (mode == "play" && playMode !== "play") {
         playMode = mode;
         countUpTimer();
     }
-    if (mode === "compare")
+    if (mode === "compare") {
+        compareButton.disabled = true;
+        compareButton.style.display = "none";
+        backButton.disabled = false;
+        backButton.style.display = "inline-block";
+        nextButton.disabled = false;
+        nextButton.style.display = "inline-block";
         animationCount = 0;
+    }
     playMode = mode;
     draw();
 }

@@ -16,7 +16,7 @@ function calcOffsettedAnswers(handles: Coord[], answers: Coord[]) {
     var ave = 0;
     for (var i = 0; i < n; i++)
         ave += (handles[i].x - answers[i].x) / n;
-    return answers.map(coord=>({x:coord.x + ave, y:coord.y}));
+    return answers.map(coord => ({ x: coord.x + ave, y: coord.y }));
 }
 
 function calcScore(handles: Coord[], answers: Coord[]) {
@@ -70,9 +70,9 @@ function init() {
         var y = Math.random() * (height - 24) + 12;
         var d = y + normalRamdom() * 20;
         if ([...preAnswers, answerA, answerB].every(a => (50 < euclid(a.x - x, a.y - y))))
-        preAnswers.push({ x, y, d });
+            preAnswers.push({ x, y, d });
     }
-    answers = [answerA, ...preAnswers.sort((a, b)=>a.d - b.d), answerB];
+    answers = [answerA, ...preAnswers.sort((a, b) => a.d - b.d), answerB];
 
     handles = answers.map(coord => {
         return {
@@ -218,11 +218,35 @@ function draw2() {
 }
 
 function setPlayMode(mode: "ready" | "play" | "compare") {
+    let compareButton = document.getElementById("compare") as HTMLButtonElement;
+    let backButton = document.getElementById("back") as HTMLButtonElement;
+    let nextButton = document.getElementById("next") as HTMLButtonElement;
+
+    if(mode !== "compare") {
+        compareButton.disabled = false;
+        compareButton.style.display = "inline-block";
+
+        backButton.disabled = true;
+        backButton.style.display = "none";
+        nextButton.disabled = true;
+        nextButton.style.display = "none";
+    }
+
     if (mode == "play" && playMode !== "play") {
         playMode = mode;
         countUpTimer();
     }
-    if (mode === "compare") animationCount = 0;
+    if (mode === "compare"){
+        compareButton.disabled = true;
+        compareButton.style.display = "none";
+
+        backButton.disabled = false;
+        backButton.style.display = "inline-block";
+        nextButton.disabled = false;
+        nextButton.style.display = "inline-block";
+
+        animationCount = 0;
+    }
 
     playMode = mode;
 
