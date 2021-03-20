@@ -8,6 +8,7 @@ var canvas2: HTMLCanvasElement, context2: CanvasRenderingContext2D, height2: num
 var playMode: "ready" | "play" | "compare";
 var animationCount: number = 0;
 var timer: number = 0;
+const strokes: Stroke[] = [];
 
 function assure<T extends new (...args: any[]) => any>(a: any, b: T): InstanceType<T> {
     if (a instanceof b) return a;
@@ -111,6 +112,7 @@ function init() {
         a.type = "radio";
         a.id = "color" + i;
         a.name = "colors";
+        a.checked = i === 0;
         li.appendChild(a);
 
         let b = document.createElement("label");
@@ -133,7 +135,6 @@ function init() {
                 log: [{ x: touch.clientX - rect.left, y: touch.clientY - rect.top }],
             };
             strokes.push(stroke);
-            strokeStart(stroke);
         });
     }, false);
     canvas.addEventListener("touchmove", (event) => {
@@ -144,7 +145,6 @@ function init() {
             if (stroke === undefined)
                 return;
             stroke.log.push({ x: touch.clientX - rect.left, y: touch.clientY - rect.top });
-            strokeMove(stroke);
         });
     }, false);
     canvas.addEventListener("touchend", (event) => {
@@ -155,7 +155,6 @@ function init() {
                 return;
             const stroke = strokes[strokeIndex];
             strokes.splice(strokeIndex, 1); // remove it; we're done
-            strokeEnd(stroke);
         });
     }, false);
     canvas.addEventListener("touchcancel", (event) => {
@@ -211,6 +210,29 @@ function down() {
     navigator.vibrate(100);
     setPlayMode("play");
 }
+const minFlick = 30;
+const maxFlick = 100;
+function move(stroke: Stroke) {
+    setPlayMode("play");
+
+    const dx = stroke.log[stroke.log.length - 1].x - stroke.log[0].x;
+    const dy = stroke.log[stroke.log.length - 1].y - stroke.log[0].y;
+    const d = euclid(dx, dy);
+    if (minFlick < d) {
+        const selected = getSelected();
+        const speed = getPitch() / 60 * d / maxFlick;
+        const cos = dx / d;
+        const sin = dy / d;
+
+        handles[selected].x += speed * cos;
+        handles[selected].x = Math.max(0, Math.min(width, handles[selected].x));
+
+        if (selected !== 0 && selected !== n - 1) {
+            handles[selected].y += speed * sin;
+            handles[selected].y = Math.max(0, Math.min(height, handles[selected].y));
+        }
+    }
+}
 
 function draw2() {
     context2.clearRect(0, 0, width, height);
@@ -227,7 +249,7 @@ function setPlayMode(mode: "ready" | "play" | "compare") {
     let backButton = assure(document.getElementById("back"), HTMLButtonElement);
     let nextButton = assure(document.getElementById("next"), HTMLButtonElement);
 
-    if(mode !== "compare") {
+    if (mode !== "compare") {
         compareButton.disabled = false;
         compareButton.style.display = "inline-block";
 
@@ -241,7 +263,7 @@ function setPlayMode(mode: "ready" | "play" | "compare") {
         playMode = mode;
         countUpTimer();
     }
-    if (mode === "compare"){
+    if (mode === "compare") {
         compareButton.disabled = true;
         compareButton.style.display = "none";
 
@@ -254,11 +276,7 @@ function setPlayMode(mode: "ready" | "play" | "compare") {
     }
 
     playMode = mode;
-
-    draw();
 }
-
-window.onload = init;
 
 interface Coord {
     x: number;
@@ -269,21 +287,6 @@ interface Stroke {
     id: number;
 }
 
-const strokes: Stroke[] = [];
-function strokeStart(stroke: Stroke) {
-}
-function strokeMove(stroke: Stroke) {
-    draw();
-}
-function strokeEnd(stroke: Stroke) {
-    draw();
-    switch (isFrick(stroke)) {
-        case "left": left(); break;
-        case "right": right(); break;
-        case "up": up(); break;
-        case "down": down(); break;
-    }
-}
 function draw() {
     switch (playMode) {
         case "ready":
@@ -362,68 +365,43 @@ function draw() {
                 context.arc(log[frame][i].x, log[frame][i].y, 10, 0, 2 * Math.PI);
                 context.fill();
             }
-
-            if (frame < log.length - 1) requestAnimationFrame(draw);
         } break;
     }
 
-    context.fillStyle = "rgba(0, 0, 0, 0.5)";
+    context.strokeStyle = "gray";
+    context.fillStyle = "lightgray";
     strokes.forEach((stroke) => {
-        switch (isFrick(stroke)) {
-            case "left":
-                {
-                    context.beginPath();
-                    context.moveTo(stroke.log[0].x, stroke.log[0].y);
-                    context.lineTo(stroke.log[0].x - 50, stroke.log[0].y - 50);
-                    context.lineTo(stroke.log[0].x - 50, stroke.log[0].y + 50);
-                    context.closePath();
-                    context.fill();
-                }
-                break;
-            case "right":
-                {
-                    context.beginPath();
-                    context.moveTo(stroke.log[0].x, stroke.log[0].y);
-                    context.lineTo(stroke.log[0].x + 50, stroke.log[0].y - 50);
-                    context.lineTo(stroke.log[0].x + 50, stroke.log[0].y + 50);
-                    context.closePath();
-                    context.fill();
-                }
-                break;
-            case "up":
-                {
-                    context.beginPath();
-                    context.moveTo(stroke.log[0].x, stroke.log[0].y);
-                    context.lineTo(stroke.log[0].x - 50, stroke.log[0].y - 50);
-                    context.lineTo(stroke.log[0].x + 50, stroke.log[0].y - 50);
-                    context.closePath();
-                    context.fill();
-                }
-                break;
-            case "down":
-                {
-                    context.beginPath();
-                    context.moveTo(stroke.log[0].x, stroke.log[0].y);
-                    context.lineTo(stroke.log[0].x - 50, stroke.log[0].y + 50);
-                    context.lineTo(stroke.log[0].x + 50, stroke.log[0].y + 50);
-                    context.closePath();
-                    context.fill();
-                }
-                break;
+        const dx = stroke.log[stroke.log.length - 1].x - stroke.log[0].x;
+        const dy = stroke.log[stroke.log.length - 1].y - stroke.log[0].y;
+        const d = euclid(dx, dy);
+        context.beginPath();
+        context.arc(stroke.log[0].x, stroke.log[0].y, maxFlick + 50, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
+        context.stroke();
+        if (minFlick < d) {
+            const x = dx / d * Math.min(d, maxFlick);
+            const y = dy / d * Math.min(d, maxFlick);
+            context.beginPath();
+            context.arc(stroke.log[0].x + x, stroke.log[0].y + y, 50, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
+            context.stroke();
+            context.fill();
+        }
+        else {
+            context.beginPath();
+            context.arc(stroke.log[0].x, stroke.log[0].y, 50, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
+            context.stroke();
+            context.fill();
         }
     });
 }
 
-const flickRange = 50;
-function isFrick(stroke: Stroke) {
-    const dx = stroke.log[stroke.log.length - 1].x - stroke.log[0].x;
-    const dy = stroke.log[stroke.log.length - 1].y - stroke.log[0].y;
-    if (dx * dx + dy * dy < flickRange * flickRange)
-        return null;
-    if (Math.abs(dy) < Math.abs(dx)) {
-        return (0 < dx) ? "right" : "left";
-    }
-    else {
-        return (0 < dy) ? "down" : "up";
-    }
+
+function update() {
+    strokes.forEach(stroke => move(stroke));
+    draw();
+    requestAnimationFrame(update);
+}
+
+window.onload = () => {
+    init();
+    update();
 }
