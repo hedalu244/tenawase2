@@ -18,11 +18,13 @@
     #canvas {
       border: 1px solid #333;
       display: block;
-      margin: 0 100px;
+      margin: auto;
     }
 
     #wrapper {
-      display: flex
+      float:left;
+      width: 100%;
+      position: relative;
     }
 
     button {
@@ -50,9 +52,9 @@
     #colors {
       list-style: none;
       padding: 0;
-      margin-left: 50px;
-      margin-left: 50px;
-      width: 0;
+      position: absolute;
+      top: 0;
+      right: 50px;
     }
 
     #colors input[type=radio] {
@@ -92,8 +94,8 @@
   </div>
   <canvas id="canvas2" width="400" height="400"></canvas><br>
   <div id="wrapper">
-    <ul id="colors" style="float: left;"></ul>
-    <canvas id="canvas" width="514" height="670" style="margin: auto;"></canvas><br>
+    <canvas id="canvas" width="514" height="670"></canvas>
+    <ul id="colors"></ul>
   </div>
 </body>
 
