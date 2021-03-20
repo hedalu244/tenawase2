@@ -11,10 +11,19 @@ var timer: number = 0;
 
 function euclid(dx: number, dy: number): number { return Math.sqrt(dx * dx + dy * dy); }
 
+function calcOffsettedAnswers(handles: Coord[], answers: Coord[]) {
+    //横ズレ平均を算出
+    var ave = 0;
+    for (var i = 0; i < n; i++)
+        ave += (handles[i].x - answers[i].x) / n;
+    return answers.map(coord=>({x:coord.x + ave, y:coord.y}));
+}
+
 function calcScore(handles: Coord[], answers: Coord[]) {
+    let offsetted = calcOffsettedAnswers(handles, answers);
     var sum = 0;
     for (var i = 0; i < n; i++)
-        sum += euclid(handles[i].x - answers[i].x, handles[i].y - answers[i].y);
+        sum += euclid(handles[i].x - offsetted[i].x, handles[i].y - offsetted[i].y);
     return Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
 }
 
@@ -311,16 +320,12 @@ function draw() {
             context.fillStyle = "rgba(255, 255, 255, 0.2)";
             context.fillRect(0, 0, width, height);
 
+            let offsetted = calcOffsettedAnswers(log[frame], answers);
+
             for (var i = 0; i < n; i++) {
-                /*
-                context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
-                context.beginPath();
-                context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
-                context.fill();
-                */
                 context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
                 context.beginPath();
-                context.arc(answers[i].x, answers[i].y, 10, 0, 2 * Math.PI);
+                context.arc(offsetted[i].x, offsetted[i].y, 10, 0, 2 * Math.PI);
                 context.fill();
 
                 context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
