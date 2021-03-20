@@ -3,20 +3,25 @@ var handles = [];
 var answers = [];
 var log = [];
 var n = 8;
-var colors = [[10, 10, 10], [10, 10, 10], [255, 0, 0], [210, 210, 0], [0, 190, 0], [0, 190, 230], [0, 0, 255], [210, 0, 210]];
-var colorName = ["", "black", "red", "yellow", "green", "sky", "blue", "violet"];
+var colors = [[10, 10, 10], [255, 0, 0], [210, 210, 0], [0, 190, 0], [0, 190, 230], [0, 0, 255], [210, 0, 210], [10, 10, 10]];
 var canvas, context, width, height;
 var canvas2, context2, height2;
-var canvas, context;
-var selected;
 var playMode;
 var animationCount = 0;
 var timer = 0;
 function euclid(dx, dy) { return Math.sqrt(dx * dx + dy * dy); }
+function calcOffsettedAnswers(handles, answers) {
+    //横ズレ平均を算出
+    var ave = 0;
+    for (var i = 0; i < n; i++)
+        ave += (handles[i].x - answers[i].x) / n;
+    return answers.map(coord => ({ x: coord.x + ave, y: coord.y }));
+}
 function calcScore(handles, answers) {
+    let offsetted = calcOffsettedAnswers(handles, answers);
     var sum = 0;
     for (var i = 0; i < n; i++)
-        sum += euclid(handles[i].x - answers[i].x, handles[i].y - answers[i].y);
+        sum += euclid(handles[i].x - offsetted[i].x, handles[i].y - offsetted[i].y);
     return Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
 }
 function countUpTimer() {
@@ -34,6 +39,10 @@ function countUpTimer() {
         return s;
     }
 }
+//擬似正規分布
+function normalRamdom() {
+    return Math.log(1 / Math.random() - 1) / 0.58763;
+}
 function init() {
     canvas = document.getElementById("canvas");
     context = canvas.getContext("2d");
@@ -45,28 +54,27 @@ function init() {
     canvas2.height = height2;
     canvas2.width = height2 * width / height;
     canvas2.style.marginLeft = (Math.random() * (window.innerWidth - canvas2.width)) + "px";
-    handles = [];
-    answers = [];
     log = [];
-    selected = 0;
     timer = 0;
-    var x = Math.floor(Math.random() * (width - 24) + 12);
-    handles.push({ x, y: 12 });
-    answers.push({ x, y: 12 });
-    handles.push({ x: Math.floor(Math.random() * (width - 24) + 12), y: height - 12 });
-    answers.push({ x: Math.floor(Math.random() * (width - 24) + 12), y: height - 12 });
-    while (handles.length < n) {
-        var x = Math.floor(Math.random() * (width - 24) + 12);
-        var y = Math.floor(Math.random() * (height - 24) + 12);
-        if (handles.every(a => (50 < euclid(a.x - x, a.y - y))))
-            handles.push({ x, y });
+    let answerA = { x: Math.floor(Math.random() * (width - 24) + 12), y: 12 };
+    let answerB = { x: Math.floor(Math.random() * (width - 24) + 12), y: height - 12 };
+    let preAnswers = [];
+    while (preAnswers.length < n - 2) {
+        var x = Math.random() * (width - 24) + 12;
+        var y = Math.random() * (height - 24) + 12;
+        var d = y + normalRamdom() * 20;
+        if ([...preAnswers, answerA, answerB].every(a => (50 < euclid(a.x - x, a.y - y))))
+            preAnswers.push({ x, y, d });
     }
-    while (answers.length < n) {
-        var x = Math.floor(Math.random() * (width - 24) + 12);
-        var y = Math.floor(Math.random() * (height - 24) + 12);
-        if (answers.every(a => (50 < euclid(a.x - x, a.y - y))))
-            answers.push({ x, y });
-    }
+    answers = [answerA, ...preAnswers.sort((a, b) => a.d - b.d), answerB];
+    handles = answers.map(coord => {
+        return {
+            x: Math.max(0, Math.min(width, coord.x + normalRamdom() * 0.05 * height)),
+            y: Math.max(0, Math.min(height, coord.y + normalRamdom() * 0.05 * height))
+        };
+    });
+    handles[0].y = 12;
+    handles[n - 1].y = height - 12;
     log.push(JSON.parse(JSON.stringify(handles)));
     draw2();
     document.onkeydown = (event) => {
@@ -91,7 +99,7 @@ function init() {
     };
     let control = document.getElementById("colors");
     control.innerHTML = "";
-    for (let i = 1; i < colors.length; i++) {
+    for (let i = 0; i < colors.length; i++) {
         let li = document.createElement("li");
         control.appendChild(li);
         let a = document.createElement("input");
@@ -99,10 +107,6 @@ function init() {
         a.id = "color" + i;
         a.name = "colors";
         li.appendChild(a);
-        a.onchange = () => {
-            selected = i;
-            console.log(i);
-        };
         let b = document.createElement("label");
         b.setAttribute("for", a.id);
         b.innerHTML = "<span></span>";
@@ -163,9 +167,11 @@ function getPitch() {
     var b = 3;
     return a * (Math.exp(b * x) - 1) / b + 1;
 }
+function getSelected() {
+    return Array.from(document.getElementsByName("colors")).findIndex(item => item instanceof HTMLInputElement && item.checked);
+}
 function left() {
-    if (selected === 0)
-        return;
+    const selected = getSelected();
     handles[selected].x -= getPitch();
     if (handles[selected].x < 0)
         handles[selected].x = 0;
@@ -173,8 +179,7 @@ function left() {
     setPlayMode("play");
 }
 function right() {
-    if (selected === 0)
-        return;
+    const selected = getSelected();
     handles[selected].x += getPitch();
     if (width < handles[selected].x)
         handles[selected].x = width;
@@ -182,7 +187,8 @@ function right() {
     setPlayMode("play");
 }
 function up() {
-    if (selected === 0 || selected === 1)
+    const selected = getSelected();
+    if (selected === 0 || selected === n - 1)
         return;
     handles[selected].y -= getPitch();
     if (handles[selected].y < 0)
@@ -191,7 +197,8 @@ function up() {
     setPlayMode("play");
 }
 function down() {
-    if (selected === 0 || selected === 1)
+    const selected = getSelected();
+    if (selected === 0 || selected === n - 1)
         return;
     handles[selected].y += getPitch();
     if (height < handles[selected].y)
@@ -304,16 +311,11 @@ function draw() {
                 context.stroke();
                 context.fillStyle = "rgba(255, 255, 255, 0.2)";
                 context.fillRect(0, 0, width, height);
+                let offsetted = calcOffsettedAnswers(log[frame], answers);
                 for (var i = 0; i < n; i++) {
-                    /*
-                    context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
-                    context.beginPath();
-                    context.arc(handles[i][0], handles[i][1], 10, 0, 2 * Math.PI);
-                    context.fill();
-                    */
                     context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
                     context.beginPath();
-                    context.arc(answers[i].x, answers[i].y, 10, 0, 2 * Math.PI);
+                    context.arc(offsetted[i].x, offsetted[i].y, 10, 0, 2 * Math.PI);
                     context.fill();
                     context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
                     context.beginPath();
