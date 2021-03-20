@@ -16,18 +16,10 @@ function assure(a, b) {
     throw new TypeError(`${a} is not ${b.name}.`);
 }
 function euclid(dx, dy) { return Math.sqrt(dx * dx + dy * dy); }
-function calcOffsettedAnswers(handles, answers) {
-    //横ズレ平均を算出
-    var ave = 0;
-    for (var i = 0; i < n; i++)
-        ave += (handles[i].x - answers[i].x) / n;
-    return answers.map(coord => ({ x: coord.x + ave, y: coord.y }));
-}
 function calcScore(handles, answers) {
-    let offsetted = calcOffsettedAnswers(handles, answers);
     var sum = 0;
     for (var i = 0; i < n; i++)
-        sum += euclid(handles[i].x - offsetted[i].x, handles[i].y - offsetted[i].y);
+        sum += euclid(handles[i].x - answers[i].x, handles[i].y - answers[i].y);
     return Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
 }
 function countUpTimer() {
@@ -73,6 +65,8 @@ function init() {
             preAnswers.push({ x, y, d });
     }
     answers = [answerA, ...preAnswers.sort((a, b) => a.d - b.d), answerB];
+    const offset = (width - Math.min(...answers.map(coord => coord.x)) - Math.max(...answers.map(coord => coord.x))) / 2;
+    answers = answers.map(coord => ({ x: coord.x + offset, y: coord.y }));
     handles = answers.map(coord => {
         return {
             x: Math.max(0, Math.min(width, coord.x + normalRamdom() * 0.05 * height)),
@@ -328,11 +322,10 @@ function draw() {
                 context.stroke();
                 context.fillStyle = "rgba(255, 255, 255, 0.2)";
                 context.fillRect(0, 0, width, height);
-                let offsetted = calcOffsettedAnswers(log[frame], answers);
                 for (var i = 0; i < n; i++) {
                     context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
                     context.beginPath();
-                    context.arc(offsetted[i].x, offsetted[i].y, 10, 0, 2 * Math.PI);
+                    context.arc(answers[i].x, answers[i].y, 10, 0, 2 * Math.PI);
                     context.fill();
                     context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
                     context.beginPath();
