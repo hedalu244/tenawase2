@@ -9,6 +9,11 @@ var canvas2, context2, height2;
 var playMode;
 var animationCount = 0;
 var timer = 0;
+function assure(a, b) {
+    if (a instanceof b)
+        return a;
+    throw new TypeError(`${a} is not ${b.name}.`);
+}
 function euclid(dx, dy) { return Math.sqrt(dx * dx + dy * dy); }
 function calcOffsettedAnswers(handles, answers) {
     //横ズレ平均を算出
@@ -29,7 +34,7 @@ function countUpTimer() {
     if (playMode !== "play")
         return;
     timer++;
-    document.getElementById("timer").innerText = pad("" + Math.floor(timer / 60)) + ":" + pad("" + timer % 60);
+    assure(document.getElementById("timer"), HTMLSpanElement).innerText = pad("" + Math.floor(timer / 60)) + ":" + pad("" + timer % 60);
     setTimeout(countUpTimer, 1000);
     function pad(s) {
         if (s.length == 0)
@@ -44,12 +49,12 @@ function normalRamdom() {
     return Math.log(1 / Math.random() - 1) / 0.58763;
 }
 function init() {
-    canvas = document.getElementById("canvas");
-    context = canvas.getContext("2d");
+    canvas = assure(document.getElementById("canvas"), HTMLCanvasElement);
+    context = assure(canvas.getContext("2d"), CanvasRenderingContext2D);
     width = canvas.width;
     height = canvas.height;
-    canvas2 = document.getElementById("canvas2");
-    context2 = canvas2.getContext("2d");
+    canvas2 = assure(document.getElementById("canvas2"), HTMLCanvasElement);
+    context2 = assure(canvas2.getContext("2d"), CanvasRenderingContext2D);
     height2 = Math.random() * 200 + 400;
     canvas2.height = height2;
     canvas2.width = height2 * width / height;
@@ -97,7 +102,7 @@ function init() {
                 break;
         }
     };
-    let control = document.getElementById("colors");
+    let control = assure(document.getElementById("colors"), HTMLUListElement);
     control.innerHTML = "";
     for (let i = 0; i < colors.length; i++) {
         let li = document.createElement("li");
@@ -114,8 +119,8 @@ function init() {
         b.classList.add("colorSelect");
         li.appendChild(b);
     }
-    document.getElementById("pitch").value = "100";
-    document.getElementById("timer").innerText = "00:00";
+    assure(document.getElementById("pitch"), HTMLInputElement).value = "100";
+    assure(document.getElementById("timer"), HTMLSpanElement).innerText = "00:00";
     canvas.addEventListener("touchstart", (event) => {
         event.preventDefault();
         const rect = canvas.getBoundingClientRect();
@@ -162,7 +167,7 @@ function init() {
     setPlayMode("ready");
 }
 function getPitch() {
-    var x = +document.getElementById("pitch").value * 0.01;
+    var x = +assure(document.getElementById("pitch"), HTMLInputElement).value * 0.01;
     var a = 20;
     var b = 3;
     return a * (Math.exp(b * x) - 1) / b + 1;
@@ -216,9 +221,9 @@ function draw2() {
     }
 }
 function setPlayMode(mode) {
-    let compareButton = document.getElementById("compare");
-    let backButton = document.getElementById("back");
-    let nextButton = document.getElementById("next");
+    let compareButton = assure(document.getElementById("compare"), HTMLButtonElement);
+    let backButton = assure(document.getElementById("back"), HTMLButtonElement);
+    let nextButton = assure(document.getElementById("next"), HTMLButtonElement);
     if (mode !== "compare") {
         compareButton.disabled = false;
         compareButton.style.display = "inline-block";
