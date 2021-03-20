@@ -32,6 +32,11 @@ function countUpTimer() {
     }
 }
 
+//擬似正規分布
+function normalRamdom() {
+    return Math.log(1 / Math.random() - 1) / 0.58763;
+}
+
 function init() {
     canvas = document.getElementById("canvas");
     context = canvas.getContext("2d");
@@ -45,29 +50,31 @@ function init() {
     canvas2.width = height2 * width / height;
     canvas2.style.marginLeft = (Math.random() * (window.innerWidth - canvas2.width)) + "px";
 
-    handles = [];
-    answers = [];
     log = [];
-    selected = 0;
     timer = 0;
 
-    var x = Math.floor(Math.random() * (width - 24) + 12);
-    handles.push({ x, y: 12 });
-    answers.push({ x, y: 12 });
-    handles.push({ x: Math.floor(Math.random() * (width - 24) + 12), y: height - 12 });
-    answers.push({ x: Math.floor(Math.random() * (width - 24) + 12), y: height - 12 });
-    while (handles.length < n) {
-        var x = Math.floor(Math.random() * (width - 24) + 12);
-        var y = Math.floor(Math.random() * (height - 24) + 12);
-        if (handles.every(a => (50 < euclid(a.x - x, a.y - y))))
-            handles.push({ x, y });
+    let answerA = { x: Math.floor(Math.random() * (width - 24) + 12), y: 12 };
+    let answerB = { x: Math.floor(Math.random() * (width - 24) + 12), y: height - 12 };
+    let preAnswers = [];
+    while (preAnswers.length < n - 2) {
+        var x = Math.random() * (width - 24) + 12;
+        var y = Math.random() * (height - 24) + 12;
+        var d = y + normalRamdom() * 20;
+        if ([...preAnswers, answerA, answerB].every(a => (50 < euclid(a.x - x, a.y - y))))
+        preAnswers.push({ x, y, d });
     }
-    while (answers.length < n) {
-        var x = Math.floor(Math.random() * (width - 24) + 12);
-        var y = Math.floor(Math.random() * (height - 24) + 12);
-        if (answers.every(a => (50 < euclid(a.x - x, a.y - y))))
-            answers.push({ x, y });
-    }
+    answers = [answerA, ...preAnswers.sort((a, b)=>a.d - b.d), answerB];
+
+    handles = answers.map(coord => {
+        return {
+            x: Math.max(0, Math.min(width, coord.x + normalRamdom() * 0.05 * height)),
+            y: Math.max(0, Math.min(height, coord.y + normalRamdom() * 0.05 * height))
+        };
+    });
+
+    handles[0].y = 12;
+    handles[n - 1].y = height - 12;
+
     log.push(JSON.parse(JSON.stringify(handles)));
     draw2();
 
