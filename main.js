@@ -159,7 +159,6 @@ function down() {
     setPlayMode("play");
 }
 const minFlick = 30;
-const maxFlick = 100;
 function move(stroke) {
     setPlayMode("play");
     const dx = stroke.log[stroke.log.length - 1].x - stroke.log[0].x;
@@ -167,7 +166,7 @@ function move(stroke) {
     const d = euclid(dx, dy);
     if (minFlick < d) {
         const selected = getSelected();
-        const speed = getPitch() / 60 * d / maxFlick;
+        const speed = getPitch() / 60;
         const cos = dx / d;
         const sin = dy / d;
         handles[selected].x += speed * cos;
