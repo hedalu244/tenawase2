@@ -237,7 +237,7 @@ function draw() {
                 context.fillStyle = "lightgray";
                 context.fillText("" + calcScore(handles, answers), canvas.width / 2, 200);
                 function graphArea(x, y) {
-                    return [x * canvas.width, y * (canvas.height)];
+                    return [x * canvas.width, y * canvas.height];
                 }
                 context.strokeStyle = "gray";
                 context.beginPath();
@@ -284,6 +284,18 @@ function draw() {
                     context.beginPath();
                     context.arc(log[frame][i].x, log[frame][i].y, 10, 0, 2 * Math.PI);
                     context.fill();
+                }
+                for (var i = 60; i <= frame; i += 60) {
+                    context.strokeStyle = "#00000033";
+                    context.beginPath();
+                    context.moveTo(...graphArea(i / log.length, 0));
+                    context.lineTo(...graphArea(i / log.length, 1));
+                    context.stroke();
+                    context.font = "30px sans-serif";
+                    context.textAlign = "left";
+                    context.fillStyle = "gray";
+                    context.fillText("" + i / 60 + ":00", graphArea(i / log.length, 1)[0], canvas.height - 80);
+                    context.fillText("" + calcScore(log[i], answers), graphArea(i / log.length, 1)[0], canvas.height - 40);
                 }
             }
             break;
