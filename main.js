@@ -289,34 +289,36 @@ function draw() {
             }
             break;
     }
-    context.strokeStyle = "gray";
-    context.fillStyle = "lightgray";
-    strokes.forEach((stroke) => {
+}
+function drawVirtualStick() {
+    const outerStick = assure(document.getElementById("outerstick"), HTMLDivElement);
+    const innerStick = assure(document.getElementById("innerstick"), HTMLDivElement);
+    if (strokes.length === 0)
+        outerStick.style.display = "none";
+    else {
+        outerStick.style.display = "block";
+        const stroke = strokes[0];
         const dx = stroke.log[stroke.log.length - 1].x - stroke.log[0].x;
         const dy = stroke.log[stroke.log.length - 1].y - stroke.log[0].y;
         const d = euclid(dx, dy);
-        context.beginPath();
-        context.arc(stroke.log[0].x, stroke.log[0].y, maxFlick + 50, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
-        context.stroke();
-        if (minFlick < d) {
-            const x = dx / d * Math.min(d, maxFlick);
-            const y = dy / d * Math.min(d, maxFlick);
-            context.beginPath();
-            context.arc(stroke.log[0].x + x, stroke.log[0].y + y, 50, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
-            context.stroke();
-            context.fill();
+        outerStick.style.left = stroke.log[0].x + "px";
+        outerStick.style.top = stroke.log[0].y + "px";
+        if (d < minFlick) {
+            innerStick.style.left = "0px";
+            innerStick.style.top = "0px";
         }
         else {
-            context.beginPath();
-            context.arc(stroke.log[0].x, stroke.log[0].y, 50, 0 * Math.PI / 180, 360 * Math.PI / 180, false);
-            context.stroke();
-            context.fill();
+            const x = dx / d * Math.min(d, 100);
+            const y = dy / d * Math.min(d, 100);
+            innerStick.style.left = x + "px";
+            innerStick.style.top = y + "px";
         }
-    });
+    }
 }
 function update() {
     strokes.forEach(stroke => move(stroke));
     draw();
+    drawVirtualStick();
     requestAnimationFrame(update);
 }
 window.onload = () => {
@@ -326,9 +328,10 @@ window.onload = () => {
     height = canvas.height;
     canvas2 = assure(document.getElementById("canvas2"), HTMLCanvasElement);
     context2 = assure(canvas2.getContext("2d"), CanvasRenderingContext2D);
-    canvas.addEventListener("touchstart", (event) => {
+    const toucharea = assure(document.getElementById("toucharea"), HTMLDivElement);
+    toucharea.addEventListener("touchstart", (event) => {
         event.preventDefault();
-        const rect = canvas.getBoundingClientRect();
+        const rect = toucharea.getBoundingClientRect();
         Array.from(event.changedTouches).forEach(touch => {
             const stroke = {
                 id: touch.identifier,
@@ -337,9 +340,9 @@ window.onload = () => {
             strokes.push(stroke);
         });
     }, false);
-    canvas.addEventListener("touchmove", (event) => {
+    toucharea.addEventListener("touchmove", (event) => {
         event.preventDefault();
-        const rect = canvas.getBoundingClientRect();
+        const rect = toucharea.getBoundingClientRect();
         Array.from(event.changedTouches).forEach(touch => {
             const stroke = strokes.find(x => x.id === touch.identifier);
             if (stroke === undefined)
@@ -347,7 +350,7 @@ window.onload = () => {
             stroke.log.push({ x: touch.clientX - rect.left, y: touch.clientY - rect.top });
         });
     }, false);
-    canvas.addEventListener("touchend", (event) => {
+    toucharea.addEventListener("touchend", (event) => {
         event.preventDefault();
         Array.from(event.changedTouches).forEach(touch => {
             const strokeIndex = strokes.findIndex(x => x.id === touch.identifier);
@@ -357,7 +360,7 @@ window.onload = () => {
             strokes.splice(strokeIndex, 1); // remove it; we're done
         });
     }, false);
-    canvas.addEventListener("touchcancel", (event) => {
+    toucharea.addEventListener("touchcancel", (event) => {
         event.preventDefault();
         Array.from(event.changedTouches).forEach(touch => {
             const strokeIndex = strokes.findIndex(x => x.id === touch.identifier);
