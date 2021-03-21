@@ -20,7 +20,7 @@ function calcScore(handles, answers) {
     var sum = 0;
     for (var i = 0; i < n; i++)
         sum += euclid(handles[i].x - answers[i].x, handles[i].y - answers[i].y);
-    return Math.floor(10000 / (1 + 10 * sum / height / (n - 1))) / 100;
+    return 100 / (1 + 11.4 * sum / height / n);
 }
 function countUpTimer() {
     log.push(JSON.parse(JSON.stringify(handles)));
@@ -235,7 +235,7 @@ function draw() {
                 context.font = "140px sans-serif";
                 context.textAlign = "center";
                 context.fillStyle = "lightgray";
-                context.fillText("" + calcScore(handles, answers), canvas.width / 2, 200);
+                context.fillText(calcScore(handles, answers).toFixed(2), canvas.width / 2, 200);
                 function graphArea(x, y) {
                     return [x * canvas.width, y * canvas.height];
                 }
@@ -295,7 +295,7 @@ function draw() {
                     context.textAlign = "left";
                     context.fillStyle = "gray";
                     context.fillText("" + i / 60 + ":00", graphArea(i / log.length, 1)[0], canvas.height - 80);
-                    context.fillText("" + calcScore(log[i], answers), graphArea(i / log.length, 1)[0], canvas.height - 40);
+                    context.fillText(calcScore(log[i], answers).toFixed(2), graphArea(i / log.length, 1)[0], canvas.height - 40);
                 }
             }
             break;
