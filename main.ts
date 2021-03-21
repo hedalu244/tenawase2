@@ -298,7 +298,7 @@ function draw() {
                 context.stroke();
 
                 context.font = "30px sans-serif";
-                context.textAlign = "left";
+                context.textAlign = "right";
                 context.fillStyle = "gray";
                 context.fillText("" + i / 60 + ":00", graphArea(i / log.length, 1)[0], canvas.height - 80);
                 context.fillText(calcScore(log[i], answers).toFixed(2), graphArea(i / log.length, 1)[0], canvas.height - 40);
