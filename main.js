@@ -42,12 +42,6 @@ function normalRamdom() {
     return Math.log(1 / Math.random() - 1) / 0.58763;
 }
 function init() {
-    canvas = assure(document.getElementById("canvas"), HTMLCanvasElement);
-    context = assure(canvas.getContext("2d"), CanvasRenderingContext2D);
-    width = canvas.width;
-    height = canvas.height;
-    canvas2 = assure(document.getElementById("canvas2"), HTMLCanvasElement);
-    context2 = assure(canvas2.getContext("2d"), CanvasRenderingContext2D);
     height2 = Math.random() * 200 + 400;
     canvas2.height = height2;
     canvas2.width = height2 * width / height;
@@ -117,46 +111,6 @@ function init() {
     }
     assure(document.getElementById("pitch"), HTMLInputElement).value = "100";
     assure(document.getElementById("timer"), HTMLSpanElement).innerText = "00:00";
-    canvas.addEventListener("touchstart", (event) => {
-        event.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        Array.from(event.changedTouches).forEach(touch => {
-            const stroke = {
-                id: touch.identifier,
-                log: [{ x: touch.clientX - rect.left, y: touch.clientY - rect.top }],
-            };
-            strokes.push(stroke);
-        });
-    }, false);
-    canvas.addEventListener("touchmove", (event) => {
-        event.preventDefault();
-        const rect = canvas.getBoundingClientRect();
-        Array.from(event.changedTouches).forEach(touch => {
-            const stroke = strokes.find(x => x.id === touch.identifier);
-            if (stroke === undefined)
-                return;
-            stroke.log.push({ x: touch.clientX - rect.left, y: touch.clientY - rect.top });
-        });
-    }, false);
-    canvas.addEventListener("touchend", (event) => {
-        event.preventDefault();
-        Array.from(event.changedTouches).forEach(touch => {
-            const strokeIndex = strokes.findIndex(x => x.id === touch.identifier);
-            if (strokeIndex === -1)
-                return;
-            const stroke = strokes[strokeIndex];
-            strokes.splice(strokeIndex, 1); // remove it; we're done
-        });
-    }, false);
-    canvas.addEventListener("touchcancel", (event) => {
-        event.preventDefault();
-        Array.from(event.changedTouches).forEach(touch => {
-            const strokeIndex = strokes.findIndex(x => x.id === touch.identifier);
-            if (strokeIndex === -1)
-                return;
-            strokes.splice(strokeIndex, 1); // remove it; we're done
-        });
-    }, false);
     setPlayMode("ready");
 }
 function getPitch() {
@@ -366,6 +320,52 @@ function update() {
     requestAnimationFrame(update);
 }
 window.onload = () => {
+    canvas = assure(document.getElementById("canvas"), HTMLCanvasElement);
+    context = assure(canvas.getContext("2d"), CanvasRenderingContext2D);
+    width = canvas.width;
+    height = canvas.height;
+    canvas2 = assure(document.getElementById("canvas2"), HTMLCanvasElement);
+    context2 = assure(canvas2.getContext("2d"), CanvasRenderingContext2D);
+    canvas.addEventListener("touchstart", (event) => {
+        event.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        Array.from(event.changedTouches).forEach(touch => {
+            const stroke = {
+                id: touch.identifier,
+                log: [{ x: touch.clientX - rect.left, y: touch.clientY - rect.top }],
+            };
+            strokes.push(stroke);
+        });
+    }, false);
+    canvas.addEventListener("touchmove", (event) => {
+        event.preventDefault();
+        const rect = canvas.getBoundingClientRect();
+        Array.from(event.changedTouches).forEach(touch => {
+            const stroke = strokes.find(x => x.id === touch.identifier);
+            if (stroke === undefined)
+                return;
+            stroke.log.push({ x: touch.clientX - rect.left, y: touch.clientY - rect.top });
+        });
+    }, false);
+    canvas.addEventListener("touchend", (event) => {
+        event.preventDefault();
+        Array.from(event.changedTouches).forEach(touch => {
+            const strokeIndex = strokes.findIndex(x => x.id === touch.identifier);
+            if (strokeIndex === -1)
+                return;
+            const stroke = strokes[strokeIndex];
+            strokes.splice(strokeIndex, 1); // remove it; we're done
+        });
+    }, false);
+    canvas.addEventListener("touchcancel", (event) => {
+        event.preventDefault();
+        Array.from(event.changedTouches).forEach(touch => {
+            const strokeIndex = strokes.findIndex(x => x.id === touch.identifier);
+            if (strokeIndex === -1)
+                return;
+            strokes.splice(strokeIndex, 1); // remove it; we're done
+        });
+    }, false);
     init();
     update();
 };
