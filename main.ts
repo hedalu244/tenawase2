@@ -338,10 +338,16 @@ function drawVirtualStick() {
     }
 }
 
-
+let moved = false;
 function update() {
     animationCount++;
-    if (0 < strokes.length && move(strokes[0]) && animationCount % 160 < 80) navigator.vibrate(80);
+    if (0 < strokes.length && move(strokes[0])){
+        if (!moved) navigator.vibrate(80);
+        moved = true;
+    } else {
+        if (moved) navigator.vibrate(60);
+        moved = false;
+    }
     draw();
     drawVirtualStick();
     requestAnimationFrame(update);
@@ -411,7 +417,7 @@ window.onload = () => {
         a.id = "color" + i;
         a.name = "colors";
         a.checked = i === 0;
-        a.onchange = () => navigator.vibrate(80);
+        a.onchange = () => navigator.vibrate(60);
         li.appendChild(a);
 
         const b = document.createElement("label");
