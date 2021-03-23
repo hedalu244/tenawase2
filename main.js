@@ -149,18 +149,19 @@ function move(stroke) {
     const dx = stroke.log[stroke.log.length - 1].x - stroke.log[0].x;
     const dy = stroke.log[stroke.log.length - 1].y - stroke.log[0].y;
     const d = euclid(dx, dy);
-    if (minFlick < d) {
-        const selected = getSelected();
-        const speed = getPitch();
-        const cos = dx / d;
-        const sin = dy / d;
-        handles[selected].x += speed * cos;
-        handles[selected].x = Math.max(0, Math.min(canvas.width, handles[selected].x));
-        if (selected !== 0 && selected !== n - 1) {
-            handles[selected].y += speed * sin;
-            handles[selected].y = Math.max(0, Math.min(canvas.height, handles[selected].y));
-        }
+    if (d < minFlick)
+        return false;
+    const selected = getSelected();
+    const speed = getPitch();
+    const cos = dx / d;
+    const sin = dy / d;
+    handles[selected].x += speed * cos;
+    handles[selected].x = Math.max(0, Math.min(canvas.width, handles[selected].x));
+    if (selected !== 0 && selected !== n - 1) {
+        handles[selected].y += speed * sin;
+        handles[selected].y = Math.max(0, Math.min(canvas.height, handles[selected].y));
     }
+    return true;
 }
 function draw2() {
     context2.clearRect(0, 0, canvas2.width, canvas2.height);
@@ -312,7 +313,8 @@ function drawVirtualStick() {
 }
 function update() {
     animationCount++;
-    strokes.forEach(stroke => move(stroke));
+    if (move(strokes[0]) && animationCount % 160 < 80)
+        navigator.vibrate(80);
     draw();
     drawVirtualStick();
     requestAnimationFrame(update);
@@ -374,6 +376,7 @@ window.onload = () => {
         a.id = "color" + i;
         a.name = "colors";
         a.checked = i === 0;
+        a.onchange = () => navigator.vibrate(80);
         li.appendChild(a);
         const b = document.createElement("label");
         b.setAttribute("for", a.id);
