@@ -313,7 +313,7 @@ function drawVirtualStick() {
 }
 function update() {
     animationCount++;
-    if (move(strokes[0]) && animationCount % 160 < 80)
+    if (0 < strokes.length && move(strokes[0]) && animationCount % 160 < 80)
         navigator.vibrate(80);
     draw();
     drawVirtualStick();
