@@ -39,9 +39,9 @@ function countUpTimer() {
     }
 }
 
-//擬似正規分布
+//正規分布
 function normalRamdom() {
-    return Math.log(1 / Math.random() - 1) / 0.58763;
+    return Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random());
 }
 
 function init() {
@@ -71,8 +71,8 @@ function init() {
 
     handles = answers.map(coord => {
         return {
-            x: Math.max(0, Math.min(canvas.width, coord.x + normalRamdom() * 0.05 * canvas.height)),
-            y: Math.max(0, Math.min(canvas.height, coord.y + normalRamdom() * 0.05 * canvas.height))
+            x: Math.max(0, Math.min(canvas.width, coord.x + normalRamdom() * 0.1 * canvas.height)),
+            y: Math.max(0, Math.min(canvas.height, coord.y + normalRamdom() * 0.1 * canvas.height))
         };
     });
 
