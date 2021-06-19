@@ -23,7 +23,7 @@ function calcScore(handles, answers) {
         sum += euclid(handles[i].x - answers[i].x, handles[i].y - answers[i].y);
         sum += Math.abs(handles[i].size - answers[i].size);
     }
-    return 100 / (1 + 11.4 * sum / canvas.height / n);
+    return 100 / (1 + 5.7 * sum / canvas.height / n);
 }
 function countUpTimer() {
     log.push(JSON.parse(JSON.stringify(handles)));
@@ -123,52 +123,46 @@ function getSelected() {
 }
 function left() {
     const selected = getSelected();
-    handles[selected].x -= getPitch() * 60;
+    handles[selected].x -= getPitch();
     if (handles[selected].x < 0)
         handles[selected].x = 0;
-    navigator.vibrate(100);
     setPlayMode("play");
 }
 function right() {
     const selected = getSelected();
-    handles[selected].x += getPitch() * 60;
+    handles[selected].x += getPitch();
     if (canvas.width < handles[selected].x)
         handles[selected].x = canvas.width;
-    navigator.vibrate(100);
     setPlayMode("play");
 }
 function up() {
     const selected = getSelected();
     if (selected === 0 || selected === n - 1)
         return;
-    handles[selected].y -= getPitch() * 60;
+    handles[selected].y -= getPitch();
     if (handles[selected].y < 0)
         handles[selected].y = 0;
-    navigator.vibrate(100);
     setPlayMode("play");
 }
 function down() {
     const selected = getSelected();
     if (selected === 0 || selected === n - 1)
         return;
-    handles[selected].y += getPitch() * 60;
+    handles[selected].y += getPitch();
     if (canvas.height < handles[selected].y)
         handles[selected].y = canvas.height;
-    navigator.vibrate(100);
     setPlayMode("play");
 }
 function expand() {
     const selected = getSelected();
-    handles[selected].size += getPitch();
-    navigator.vibrate(100);
+    handles[selected].size += getPitch() * 0.5;
     setPlayMode("play");
 }
 function shrink() {
     const selected = getSelected();
-    handles[selected].size -= getPitch();
+    handles[selected].size -= getPitch() * 0.5;
     if (handles[selected].size < 10)
         handles[selected].size = 10;
-    navigator.vibrate(100);
     setPlayMode("play");
 }
 const minFlick = 30;
