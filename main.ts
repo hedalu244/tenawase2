@@ -61,8 +61,10 @@ function init() {
     log = [];
     timerCount = 0;
 
-    const answerA = { size: Math.random() * canvas.width * 0.1 + 20, x: Math.floor(Math.random() * (canvas.width - 24) + 12), y: 0 };
-    const answerB = { size: Math.random() * canvas.width * 0.1 + 20, x: Math.floor(Math.random() * (canvas.width - 24) + 12), y: canvas.height };
+    let size = Math.random() * canvas.width * 0.1 + 20;
+    const answerA = { size, x: Math.floor(Math.random() * (canvas.width - 2 * size) + size), y: 0 };
+    size = Math.random() * canvas.width * 0.1 + 20;
+    const answerB = { size, x: Math.floor(Math.random() * (canvas.width - 2 * size) + size), y: canvas.height };
     const preAnswers = [];
     while (preAnswers.length < n - 2) {
         const size = Math.random() * canvas.width * 0.1 + 20;
@@ -73,8 +75,8 @@ function init() {
             preAnswers.push({ size, x, y, d });
     }
     const offset = (canvas.width
-        - Math.min(...[...preAnswers, answerA, answerB].map(coord => coord.x))
-        - Math.max(...[...preAnswers, answerA, answerB].map(coord => coord.x))) / 2;
+        - Math.min(...[...preAnswers, answerA, answerB].map(coord => coord.x - coord.size))
+        - Math.max(...[...preAnswers, answerA, answerB].map(coord => coord.x + coord.size))) / 2;
     answers = [answerA, ...preAnswers.sort((a, b) => a.d - b.d), answerB]
         .map(answer => ({ size: answer.size, x: answer.x + offset, y: answer.y }));
 
@@ -433,10 +435,10 @@ window.onload = () => {
         });
     }, false);
 
-    const select = assure(document.getElementById("select"), HTMLUListElement);
+    const select = assure(document.getElementById("select"), HTMLDivElement);
     for (let i = 0; i < colors.length; i++) {
-        const li = document.createElement("li");
-        select.appendChild(li);
+        const div = document.createElement("div");
+        select.appendChild(div);
 
         const a = document.createElement("input");
         a.type = "radio";
@@ -444,31 +446,63 @@ window.onload = () => {
         a.name = "colors";
         a.checked = i === 0;
         a.onchange = () => navigator.vibrate(60);
-        li.appendChild(a);
+        div.appendChild(a);
 
         const b = document.createElement("label");
         b.setAttribute("for", a.id);
         b.innerHTML = "<span></span>";
         b.style.color = "rgb(" + colors[i] + ")";
         b.classList.add("colorSelect");
-        li.appendChild(b);
+        div.appendChild(b);
     }
 
     const expandButton = assure(document.getElementById("expand"), HTMLButtonElement);
     let expandIntervalId = 0;
 
-    expandButton.addEventListener("mousedown", (e) => { expandIntervalId = setInterval(expand, 20); });
-    expandButton.addEventListener("touchstart", (e) => { expandIntervalId = setInterval(expand, 20); });
-    expandButton.addEventListener("mouseup", (e) => { clearInterval(expandIntervalId); });
-    expandButton.addEventListener("touchend", (e) => { clearInterval(expandIntervalId); });
+    expandButton.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        navigator.vibrate(60);
+        expandIntervalId = setInterval(expand, 20);
+    });
+    expandButton.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        navigator.vibrate(60);
+        expandIntervalId = setInterval(expand, 20);
+    });
+    expandButton.addEventListener("mouseup", (e) => {
+        e.preventDefault();
+        navigator.vibrate(60);
+        clearInterval(expandIntervalId);
+    });
+    expandButton.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        navigator.vibrate(60);
+        clearInterval(expandIntervalId);
+    });
 
     const shrinkButton = assure(document.getElementById("shrink"), HTMLButtonElement);
     let shrinkIntervalId = 0;
 
-    shrinkButton.addEventListener("mousedown", (e) => { shrinkIntervalId = setInterval(shrink, 20); });
-    shrinkButton.addEventListener("touchstart", (e) => { shrinkIntervalId = setInterval(shrink, 20); });
-    shrinkButton.addEventListener("mouseup", (e) => { clearInterval(shrinkIntervalId); });
-    shrinkButton.addEventListener("touchend", (e) => { clearInterval(shrinkIntervalId); });
+    shrinkButton.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        navigator.vibrate(60);
+        shrinkIntervalId = setInterval(shrink, 20);
+    });
+    shrinkButton.addEventListener("touchstart", (e) => {
+        e.preventDefault();
+        navigator.vibrate(60);
+        shrinkIntervalId = setInterval(shrink, 20);
+    });
+    shrinkButton.addEventListener("mouseup", (e) => {
+        e.preventDefault();
+        navigator.vibrate(60);
+        clearInterval(shrinkIntervalId);
+    });
+    shrinkButton.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        navigator.vibrate(60);
+        clearInterval(shrinkIntervalId);
+    });
 
     init();
     update();
