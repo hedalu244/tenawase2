@@ -80,21 +80,29 @@ function init() {
     draw2();
     document.onkeydown = (event) => {
         switch (event.key) {
-            case "ArrowUp":
+            case "w":
                 event.preventDefault();
                 up();
                 break;
-            case "ArrowDown":
+            case "s":
                 event.preventDefault();
                 down();
                 break;
-            case "ArrowLeft":
+            case "a":
                 event.preventDefault();
                 left();
                 break;
-            case "ArrowRight":
+            case "d":
                 event.preventDefault();
                 right();
+                break;
+            case "q":
+                event.preventDefault();
+                shrink();
+                break;
+            case "e":
+                event.preventDefault();
+                expand();
                 break;
         }
     };
@@ -144,6 +152,20 @@ function down() {
     handles[selected].y += getPitch() * 60;
     if (canvas.height < handles[selected].y)
         handles[selected].y = canvas.height;
+    navigator.vibrate(100);
+    setPlayMode("play");
+}
+function expand() {
+    const selected = getSelected();
+    handles[selected].size += getPitch();
+    navigator.vibrate(100);
+    setPlayMode("play");
+}
+function shrink() {
+    const selected = getSelected();
+    handles[selected].size -= getPitch();
+    if (handles[selected].size < 10)
+        handles[selected].size = 10;
     navigator.vibrate(100);
     setPlayMode("play");
 }
@@ -399,6 +421,18 @@ window.onload = () => {
         b.classList.add("colorSelect");
         li.appendChild(b);
     }
+    const expandButton = assure(document.getElementById("expand"), HTMLButtonElement);
+    let expandIntervalId = 0;
+    expandButton.addEventListener("mousedown", (e) => { e.preventDefault(); expandIntervalId = setInterval(expand, 20); });
+    expandButton.addEventListener("touchstart", (e) => { e.preventDefault(); expandIntervalId = setInterval(expand, 20); });
+    expandButton.addEventListener("mouseup", (e) => { e.preventDefault(); clearInterval(expandIntervalId); });
+    expandButton.addEventListener("touchend", (e) => { e.preventDefault(); clearInterval(expandIntervalId); });
+    const shrinkButton = assure(document.getElementById("shrink"), HTMLButtonElement);
+    let shrinkIntervalId = 0;
+    shrinkButton.addEventListener("mousedown", (e) => { e.preventDefault(); shrinkIntervalId = setInterval(shrink, 20); });
+    shrinkButton.addEventListener("touchstart", (e) => { e.preventDefault(); shrinkIntervalId = setInterval(shrink, 20); });
+    shrinkButton.addEventListener("mouseup", (e) => { e.preventDefault(); clearInterval(shrinkIntervalId); });
+    shrinkButton.addEventListener("touchend", (e) => { e.preventDefault(); clearInterval(shrinkIntervalId); });
     init();
     update();
 };

@@ -61,7 +61,7 @@ function init() {
     log = [];
     timerCount = 0;
 
-    const answerA = { size: Math.random() * canvas.width * 0.1 + 20, x: Math.floor(Math.random() * (canvas.width - 24) + 12), y: 0};
+    const answerA = { size: Math.random() * canvas.width * 0.1 + 20, x: Math.floor(Math.random() * (canvas.width - 24) + 12), y: 0 };
     const answerB = { size: Math.random() * canvas.width * 0.1 + 20, x: Math.floor(Math.random() * (canvas.width - 24) + 12), y: canvas.height };
     const preAnswers = [];
     while (preAnswers.length < n - 2) {
@@ -94,10 +94,12 @@ function init() {
 
     document.onkeydown = (event) => {
         switch (event.key) {
-            case "ArrowUp": event.preventDefault(); up(); break;
-            case "ArrowDown": event.preventDefault(); down(); break;
-            case "ArrowLeft": event.preventDefault(); left(); break;
-            case "ArrowRight": event.preventDefault(); right(); break;
+            case "w": event.preventDefault(); up(); break;
+            case "s": event.preventDefault(); down(); break;
+            case "a": event.preventDefault(); left(); break;
+            case "d": event.preventDefault(); right(); break;
+            case "q": event.preventDefault(); shrink(); break;
+            case "e": event.preventDefault(); expand(); break;
         }
     };
 
@@ -148,6 +150,19 @@ function down() {
     navigator.vibrate(100);
     setPlayMode("play");
 }
+function expand() {
+    const selected = getSelected();
+    handles[selected].size += getPitch();
+    navigator.vibrate(100);
+    setPlayMode("play");
+}
+function shrink() {
+    const selected = getSelected();
+    handles[selected].size -= getPitch();
+    if (handles[selected].size < 10) handles[selected].size = 10;
+    navigator.vibrate(100);
+    setPlayMode("play");
+}
 const minFlick = 30;
 function move(stroke: Stroke): boolean {
     setPlayMode("play");
@@ -155,7 +170,7 @@ function move(stroke: Stroke): boolean {
     const dx = stroke.log[stroke.log.length - 1].x - stroke.log[0].x;
     const dy = stroke.log[stroke.log.length - 1].y - stroke.log[0].y;
     const d = euclid(dx, dy);
-    
+
     if (d < minFlick) return false;
 
     const selected = getSelected();
@@ -179,7 +194,7 @@ function draw2() {
     for (let i = 0; i < n; i++) {
         context2.fillStyle = "rgba(" + colors[i] + ", 0.8)";
         context2.beginPath();
-        context2.arc(answers[i].x *scale, answers[i].y * scale, answers[i].size * scale, 0, 2 * Math.PI);
+        context2.arc(answers[i].x * scale, answers[i].y * scale, answers[i].size * scale, 0, 2 * Math.PI);
         context2.fill();
     }
 }
@@ -352,7 +367,7 @@ function drawVirtualStick() {
 let moved = false;
 function update() {
     animationCount++;
-    if (0 < strokes.length && move(strokes[0])){
+    if (0 < strokes.length && move(strokes[0])) {
         if (!moved) navigator.vibrate(80);
         moved = true;
     } else {
@@ -438,6 +453,22 @@ window.onload = () => {
         b.classList.add("colorSelect");
         li.appendChild(b);
     }
+
+    const expandButton = assure(document.getElementById("expand"), HTMLButtonElement);
+    let expandIntervalId = 0;
+
+    expandButton.addEventListener("mousedown", (e) => { expandIntervalId = setInterval(expand, 20); });
+    expandButton.addEventListener("touchstart", (e) => { expandIntervalId = setInterval(expand, 20); });
+    expandButton.addEventListener("mouseup", (e) => { clearInterval(expandIntervalId); });
+    expandButton.addEventListener("touchend", (e) => { clearInterval(expandIntervalId); });
+
+    const shrinkButton = assure(document.getElementById("shrink"), HTMLButtonElement);
+    let shrinkIntervalId = 0;
+
+    shrinkButton.addEventListener("mousedown", (e) => { shrinkIntervalId = setInterval(shrink, 20); });
+    shrinkButton.addEventListener("touchstart", (e) => { shrinkIntervalId = setInterval(shrink, 20); });
+    shrinkButton.addEventListener("mouseup", (e) => { clearInterval(shrinkIntervalId); });
+    shrinkButton.addEventListener("touchend", (e) => { clearInterval(shrinkIntervalId); });
 
     init();
     update();

@@ -112,6 +112,19 @@
       width: 80px;
       height: 80px;
     }
+
+    #shrink, #expand {
+      font-size: 40px;
+      font-family: sans-serif;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      outline: none;
+      background-color: white;
+      color: #333;
+      border: 3px solod #333;
+      user-select: none;
+    }
   </style>
 </head>
 
@@ -124,6 +137,8 @@
     <span id="timer" style="color: gray; font-size: 4em; margin-left: 3em"></span>
   </div>
   <canvas id="canvas2" width="400" height="400"></canvas><br>
+  <button id="expand">+</button>
+  <button id="shrink">-</button>
   <div id="wrapper">
     <div id="toucharea">
       <div id="outerstick">
