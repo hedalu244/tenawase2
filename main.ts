@@ -1,6 +1,12 @@
-let handles: Coord[] = [];
-let answers: Coord[] = [];
-let log: Coord[][] = [];
+interface Handle {
+    x: number;
+    y: number;
+    size: number;
+}
+
+let handles: Handle[] = [];
+let answers: Handle[] = [];
+let log: Handle[][] = [];
 const n = 8;
 let colors = [[10, 10, 10], [255, 0, 0], [210, 210, 0], [0, 190, 0], [0, 190, 230], [0, 0, 255], [210, 0, 210], [10, 10, 10]];
 let canvas: HTMLCanvasElement, context: CanvasRenderingContext2D;
@@ -18,10 +24,12 @@ function assure<T extends new (...args: any[]) => any>(a: any, b: T): InstanceTy
 
 function euclid(dx: number, dy: number): number { return Math.sqrt(dx * dx + dy * dy); }
 
-function calcScore(handles: Coord[], answers: Coord[]) {
+function calcScore(handles: Handle[], answers: Handle[]) {
     let sum = 0;
-    for (let i = 0; i < n; i++)
+    for (let i = 0; i < n; i++) {
         sum += euclid(handles[i].x - answers[i].x, handles[i].y - answers[i].y);
+        sum += Math.abs(handles[i].size - answers[i].size);
+    }
     return 100 / (1 + 11.4 * sum / canvas.height / n);
 }
 
@@ -53,26 +61,28 @@ function init() {
     log = [];
     timerCount = 0;
 
-    const answerA = { x: Math.floor(Math.random() * (canvas.width - 24) + 12), y: 12 };
-    const answerB = { x: Math.floor(Math.random() * (canvas.width - 24) + 12), y: canvas.height - 12 };
+    const answerA = { size: Math.random() * canvas.width * 0.1 + 20, x: Math.floor(Math.random() * (canvas.width - 24) + 12), y: 0};
+    const answerB = { size: Math.random() * canvas.width * 0.1 + 20, x: Math.floor(Math.random() * (canvas.width - 24) + 12), y: canvas.height };
     const preAnswers = [];
     while (preAnswers.length < n - 2) {
-        let x = Math.random() * (canvas.width - 24) + 12;
-        let y = Math.random() * (canvas.height - 24) + 12;
-        let d = y + normalRamdom() * 20;
-        if ([...preAnswers, answerA, answerB].every(a => (50 < euclid(a.x - x, a.y - y))))
-            preAnswers.push({ x, y, d });
+        const size = Math.random() * canvas.width * 0.1 + 20;
+        const x = Math.random() * (canvas.width - 2 * size) + size;
+        const y = Math.random() * (canvas.height - 2 * size) + size;
+        const d = y + normalRamdom() * 20;
+        if ([...preAnswers, answerA, answerB].every(a => (a.size + size + 20 < euclid(a.x - x, a.y - y))))
+            preAnswers.push({ size, x, y, d });
     }
     const offset = (canvas.width
         - Math.min(...[...preAnswers, answerA, answerB].map(coord => coord.x))
         - Math.max(...[...preAnswers, answerA, answerB].map(coord => coord.x))) / 2;
     answers = [answerA, ...preAnswers.sort((a, b) => a.d - b.d), answerB]
-        .map(coord => ({ x: coord.x + offset, y: coord.y }));
+        .map(answer => ({ size: answer.size, x: answer.x + offset, y: answer.y }));
 
-    handles = answers.map(coord => {
+    handles = answers.map(answer => {
         return {
-            x: Math.max(0, Math.min(canvas.width, coord.x + normalRamdom() * 0.1 * canvas.height)),
-            y: Math.max(0, Math.min(canvas.height, coord.y + normalRamdom() * 0.1 * canvas.height))
+            size: Math.max(10, answer.size + normalRamdom() * 0.02 * canvas.height),
+            x: Math.max(0, Math.min(canvas.width, answer.x + normalRamdom() * 0.1 * canvas.height)),
+            y: Math.max(0, Math.min(canvas.height, answer.y + normalRamdom() * 0.1 * canvas.height))
         };
     });
 
@@ -165,10 +175,11 @@ function move(stroke: Stroke): boolean {
 
 function draw2() {
     context2.clearRect(0, 0, canvas2.width, canvas2.height);
+    const scale = canvas2.height / canvas.height;
     for (let i = 0; i < n; i++) {
         context2.fillStyle = "rgba(" + colors[i] + ", 0.8)";
         context2.beginPath();
-        context2.arc(answers[i].x * canvas2.height / canvas.height, answers[i].y * canvas2.height / canvas.height, 10 * canvas2.height / canvas.height, 0, 2 * Math.PI);
+        context2.arc(answers[i].x *scale, answers[i].y * scale, answers[i].size * scale, 0, 2 * Math.PI);
         context2.fill();
     }
 }
@@ -224,7 +235,7 @@ function draw() {
             for (let i = 0; i < n; i++) {
                 context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
                 context.beginPath();
-                context.arc(handles[i].x, handles[i].y, 10, 0, 2 * Math.PI);
+                context.arc(handles[i].x, handles[i].y, handles[i].size, 0, 2 * Math.PI);
                 context.fill();
             }
         } break;
@@ -281,14 +292,14 @@ function draw() {
             context.fillRect(0, 0, canvas.width, canvas.height);
 
             for (let i = 0; i < n; i++) {
+                context.strokeStyle = "rgba(" + colors[i] + ", 1)";
+                context.beginPath();
+                context.arc(answers[i].x, answers[i].y, answers[i].size, 0, 2 * Math.PI);
+                context.stroke();
+
                 context.fillStyle = "rgba(" + colors[i] + ", 0.5)";
                 context.beginPath();
-                context.arc(answers[i].x, answers[i].y, 10, 0, 2 * Math.PI);
-                context.fill();
-
-                context.fillStyle = "rgba(" + colors[i] + ", 0.8)";
-                context.beginPath();
-                context.arc(log[frame][i].x, log[frame][i].y, 10, 0, 2 * Math.PI);
+                context.arc(log[frame][i].x, log[frame][i].y, log[frame][i].size, 0, 2 * Math.PI);
                 context.fill();
             }
 
