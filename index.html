@@ -29,8 +29,8 @@
     }
 
     #toucharea{
-      width:70%;
-      height: 100vh;
+      width:100%;
+      height: 100%;
       position: absolute;
     }
 
@@ -59,9 +59,11 @@
     #select {
       list-style: none;
       padding: 0;
-      position: absolute;
-      top: 0;
-      right: 50px;
+      width: 100%;
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      margin-top: 20px;
     }
 
     #select input[type=radio] {
@@ -137,8 +139,6 @@
     <span id="timer" style="color: gray; font-size: 4em; margin-left: 3em"></span>
   </div>
   <canvas id="canvas2" width="400" height="400"></canvas><br>
-  <button id="expand">+</button>
-  <button id="shrink">-</button>
   <div id="wrapper">
     <div id="toucharea">
       <div id="outerstick">
@@ -146,7 +146,10 @@
       </div>
     </div>
     <canvas id="canvas" width="514" height="670"></canvas>
-    <ul id="select"></ul>
+  </div>
+  <div id="select">
+    <button id="expand">+</button>
+    <button id="shrink">-</button>
   </div>
 </body>
 
