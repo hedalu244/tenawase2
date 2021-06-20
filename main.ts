@@ -82,7 +82,7 @@ function init() {
 
     handles = answers.map(answer => {
         return {
-            size: Math.max(10, answer.size + normalRamdom() * 0.02 * canvas.height),
+            size: 10 + Math.random() * 20,
             x: Math.max(0, Math.min(canvas.width, answer.x + normalRamdom() * 0.1 * canvas.height)),
             y: Math.max(0, Math.min(canvas.height, answer.y + normalRamdom() * 0.1 * canvas.height))
         };
