@@ -30,7 +30,7 @@ function calcScore(handles: Handle[], answers: Handle[]) {
         sum += euclid(handles[i].x - answers[i].x, handles[i].y - answers[i].y);
         sum += Math.abs(handles[i].size - answers[i].size);
     }
-    return 100 / (1 + 5.7 * sum / canvas.height / n);
+    return 100 / (1 + 11.4 * sum / canvas.height / n);
 }
 
 function countUpTimer() {
